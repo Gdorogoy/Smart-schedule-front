@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Avatar,
@@ -10,50 +10,53 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import { fetchUser, update } from "../userService";
+import { getUser, updateUser } from "../Services/UserService";
+import { AuthContext } from "../AuthProvider";
 
-const UserSetting = ({user}) => {
+const UserSetting = () => {
+    const {user,setUser} = useContext(AuthContext);
     const navigate = useNavigate();
-    const [loading, setLoading] = useState(true);
     const [edit, setEdit] = useState(false);
+    const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
-        firstame: "",
-        lastname: "",
-        email: "",
-        timeZone: "",
-        password: "",
-        newPass: "",
-        confirmPassword: "",
-        ogPassword: ""
+        firstName: " ",
+        lastName: " ",
+        email: " ",
+        timeZone: " ",
+        ogPassword: " ",
+        newPassword: " ",
+        confirmPassword: " "
     });
+
 
     useEffect(() => {
         const getUserData = async () => {
             try {
                 setLoading(true);
-                const res = await fetchUser(user);
-                const userData=res.content;
+                const res = await getUser(user.userId, user.token);
+                const userData = res.content;
 
-                setFormData({
+                setFormData(prev => ({
+                    ...prev,
                     firstName: userData.firstname || "",
                     lastName: userData.lastname || "",
                     email: userData.email || "",
                     timeZone: userData.timeZone || "",
-                    password: "",
+                    ogPassword: "",
                     newPassword: "",
-                    confirmPassword: "",
-                    ogPassword: ""
-                });
-                setLoading(false);
+                    confirmPassword: ""
+                }));
             } catch (error) {
                 console.error("Error fetching user data:", error);
-                setLoading(false);
                 alert("Failed to load user data");
+            } finally {
+                setLoading(false);
             }
         };
 
         getUserData();
-    }, [user.userId]);
+    }, [user.userId, user.token]);
+
 
 
     const handleChange = (e) => {
@@ -61,40 +64,43 @@ const UserSetting = ({user}) => {
     };
 
     const handleSave = async () => {
-        if (formData.newPassword || formData.confirmPassword) {
-            if (formData.newPassword !== formData.confirmPassword) {
+        const { newPassword, confirmPassword, ogPassword } = formData;
+
+        if (newPassword || confirmPassword) {
+            if (newPassword !== confirmPassword) {
                 alert("New passwords do not match");
                 return;
-            }
-            if (!formData.ogPassword) {
+        }
+            if (!ogPassword) {
                 alert("Please enter your current password");
                 return;
             }
         }
 
         try {
-            await update(user, formData);
+            await updateUser(user.userId, user.token, formData);
             alert("Profile updated successfully!");
             setEdit(false);
-            
+
             setFormData(prev => ({
-                ...prev,
-                ogPassword: "",
-                newPassword: "",
-                confirmPassword: ""
+            ...prev,
+            ogPassword: "",
+            newPassword: "",
+            confirmPassword: ""
             }));
         } catch (error) {
-            console.error("Error updating user:", error);
+            console.error(error);
             alert("Failed to update profile");
         }
     };
+
 
     const handleCancel = () => {
         setEdit(false);
         setFormData(prev => ({
             ...prev,
             ogPassword: "",
-            newPassword: "",
+            newPass: "",
             confirmPassword: ""
         }));
     };
@@ -181,7 +187,7 @@ const UserSetting = ({user}) => {
                 />
                 <TextField
                     label="Time Zone"
-                    name="timezone"
+                    name="timeZone"
                     value={formData.timeZone}
                     onChange={handleChange}
                     fullWidth

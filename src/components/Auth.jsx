@@ -1,24 +1,18 @@
 import { Button, TextField } from "@mui/material";
 import { Box, Stack } from "@mui/system";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
-const Auth = ({setUser}) => {
+import { login, signup } from '../Services/AuthService.js';
+import { AuthContext } from "../AuthProvider.jsx";
+const Auth = () => {
+  const { user, setUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const isLoggedIn = () => {
-      return (
-        localStorage.getItem("token") &&
-        localStorage.getItem("refreshToken") &&
-        localStorage.getItem("userId") &&
-        localStorage.getItem("email")
-      );
-    };
-    if (isLoggedIn()) {
+    if (user?.token) {
       navigate("/calendar", { replace: true });
     }
-  }, []);
+  }, [user, navigate]);
 
   const [loginInput, setLoginInput] = useState({
     email: "",
@@ -29,7 +23,7 @@ const Auth = ({setUser}) => {
     email: "",
     password: "",
     firstname: "",
-    lastname:"",
+    lastname: "",
     timeZone: ""
   });
 
@@ -38,7 +32,7 @@ const Auth = ({setUser}) => {
 
   const handleChange = () => {
     setLoginInput({ email: "", password: "" });
-    setRegisterInput({ email: "", password: "", firstname: "",lastname:"", timeZone: "" });
+    setRegisterInput({ email: "", password: "", firstname: "", lastname: "", timeZone: "" });
     setPass("");
     setIsLogin(!isLogin);
   };
@@ -46,64 +40,37 @@ const Auth = ({setUser}) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
-
     try {
-      const url = isLogin
-        ? "http://localhost:3000/api/v1/auth/login"
-        : "http://localhost:3000/api/v1/auth/signup";
+      let data;
 
-      const body = isLogin
-        ? loginInput
-        : {
-            email: registerInput.email,
-            password: registerInput.password,
-            firstname: registerInput.firstname,
-            lastname: registerInput.lastname,
-            timeZone: registerInput.timeZone,
-          };
-
-      console.log(body);
-      if (pass !== registerInput.password && isLogin === false) {
-        alert("password should match");
-        return;
-      }
-
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body),
-      });
-
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok) {
-        alert(data.error || "Signup/Login failed");
-        return;
+      if (isLogin) {
+        data = await login(loginInput);
+      } else {
+        if (pass !== registerInput.password) {
+          alert("Passwords should match");
+          return;
+        }
+        data = await signup(registerInput);
       }
 
       if (data?.token) {
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("refreshToken", data.refreshToken || "");
-        localStorage.setItem("userId", data.user?.id || "");
-        localStorage.setItem("email", data.user?.email || "");
-
         setUser({
           token: data.token,
-          refreshToken: data.refreshToken || "",
-          userId: data.user?.id || "",
-          email: data.user?.email || ""
+          userId: data.user.content.userId,
+          email: data.user.content.email,
+          refreshToken: data.refreshToken,
         });
-        
+
         alert(isLogin ? "Login successful!" : "Signup successful!");
         navigate("/calendar", { replace: true });
+
       } else {
         console.error("No token in response:", data);
         alert("No token received from server.");
       }
     } catch (error) {
       console.error("Network or server error:", error);
-      alert("Something went wrong.");
+      alert(error.response?.data?.error || "Something went wrong.");
     }
   };
 
@@ -114,7 +81,6 @@ const Auth = ({setUser}) => {
           <Stack spacing={2}>
             <TextField
               label="Email"
-              name="email"
               fullWidth
               value={loginInput.email}
               onChange={(e) =>
@@ -124,7 +90,6 @@ const Auth = ({setUser}) => {
             />
             <TextField
               label="Password"
-              name="password"
               type="password"
               fullWidth
               value={loginInput.password}
@@ -143,7 +108,6 @@ const Auth = ({setUser}) => {
           <Stack spacing={2}>
             <TextField
               label="Email"
-              name="email"
               fullWidth
               value={registerInput.email}
               onChange={(e) =>
@@ -152,8 +116,7 @@ const Auth = ({setUser}) => {
               required
             />
             <TextField
-              label="FirstName"
-              name="name"
+              label="First Name"
               fullWidth
               value={registerInput.firstname}
               onChange={(e) =>
@@ -163,7 +126,6 @@ const Auth = ({setUser}) => {
             />
             <TextField
               label="Last Name"
-              name="name"
               fullWidth
               value={registerInput.lastname}
               onChange={(e) =>
@@ -171,8 +133,7 @@ const Auth = ({setUser}) => {
               }
             />
             <TextField
-              label="TimeZone"
-              name="timeZone"
+              label="Time Zone"
               fullWidth
               value={registerInput.timeZone}
               onChange={(e) =>
@@ -182,9 +143,8 @@ const Auth = ({setUser}) => {
             />
             <TextField
               label="Password"
-              name="password"
-              fullWidth
               type="password"
+              fullWidth
               value={registerInput.password}
               onChange={(e) =>
                 setRegisterInput({ ...registerInput, password: e.target.value })
@@ -193,9 +153,8 @@ const Auth = ({setUser}) => {
             />
             <TextField
               label="Re-enter Password"
-              name="repassword"
-              fullWidth
               type="password"
+              fullWidth
               value={pass}
               onChange={(e) => setPass(e.target.value)}
               required

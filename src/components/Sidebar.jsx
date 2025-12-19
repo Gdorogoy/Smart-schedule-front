@@ -3,6 +3,16 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import LogoutIcon from '@mui/icons-material/Logout';
 
 const Sidebar = ({ open, setOpen }) => {
+
+
+  /*
+
+  TODO HERE ADD LINK TO TEAM SOMEWHERE AND MAKE TEAM CALENDAR OR SOMETHIGN
+
+
+  */
+
+
   const toggleDrawer = (newOpen) => () => {
     setOpen(newOpen);
   };

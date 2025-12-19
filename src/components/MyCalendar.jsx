@@ -4,26 +4,20 @@ import dayGridPlugin from "@fullcalendar/daygrid/index.js";
 import timeGridPlugin from "@fullcalendar/timegrid/index.js";
 import interactionPlugin from "@fullcalendar/interaction/index.js";
 import EventFormDialog from "./EventFormDialog";
-import { create, updateTask } from "../taskService";
-import { refreshToken } from "../auth";
+import { createTask, deleteTask, updateTask } from "../Services/TaskService.js";
+import { refreshToken } from "../Services/AuthService.js";
 import Sidebar from "./Sidebar";
+import { useContext } from "react";
+import { AuthContext } from "../AuthProvider.jsx";
 
-const MyCalendar = ({events,setEvents,user}) => {
-
+const MyCalendar = ({events,setEvents}) => {
+  const {user,setUser,loading}=useContext(AuthContext);
   useEffect(() => {
-    const checkIfValid = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        const newToken = await refreshToken();
-        if (!newToken) {
-          window.location.href = "/auth";
-        } else {
-          localStorage.setItem("token", newToken);
-        }
-      }
-    };
-    checkIfValid();
-  }, []);
+    if (!loading && !user?.token) {
+      navigate("/auth", { replace: true });
+    }
+  }, [user, loading]);
+
 
 
   const [openForm, setOpenForm] = useState(false);
@@ -54,7 +48,7 @@ const MyCalendar = ({events,setEvents,user}) => {
         importance:data.importance
       }
 
-      const res=await create(user,newEv);
+      const res=await createTask(user.token,user.userId,newEv);
 
 
       setEvents([...events,res.content]);
@@ -62,6 +56,26 @@ const MyCalendar = ({events,setEvents,user}) => {
     }
       
   }
+
+  const handleDelete = async () => {
+    if (!selectedEvent?.id) return;
+    
+    try{
+      const res = await deleteTask(user.token,user.userId,selectedEvent.id);
+      console.log(res);
+
+      if(res.status==="good"){
+        setEvents(prev =>
+          prev.filter(ev => ev.id !== selectedEvent.id)
+      );
+      }
+      
+      handleCloseForm();
+    }catch(err){
+      console.log(err);
+      return err;
+    }
+  };
   
 
 
@@ -82,7 +96,7 @@ const MyCalendar = ({events,setEvents,user}) => {
     });
     setEvents(updatedEvents);
     try{
-      const res=await updateTask(user,updatedEvent);
+      const res=await updateTask(user.token,user.userId,updatedEvent.id,updatedEvent);
     }catch(err){
       console.error(err);
     }
@@ -107,7 +121,7 @@ const MyCalendar = ({events,setEvents,user}) => {
     setEvents(updatedEvents);
 
     try{
-      const res=await updateTask(user,updatedEvent);
+      const res=await updateTask(user.token,user.userId,updatedEvent.id,updatedEvent);
 
     }catch(err){
       console.error(err);
@@ -124,10 +138,14 @@ const MyCalendar = ({events,setEvents,user}) => {
 
   const handleEventClick = (info) => {
     const event={
-      title:info.event.title,
-      description:info.event.extendedProps.description,
-      importance:info.event.extendedProps.importance
+      id: info.event.id,
+      title: info.event.title,
+      description: info.event.extendedProps.description,
+      importance: info.event.extendedProps.importance,
+      start: info.event.start,
+      end: info.event.end,
     }
+
 
 
     setSelectedEvent(event);
@@ -187,6 +205,7 @@ const MyCalendar = ({events,setEvents,user}) => {
         initialData={selectedEvent || selectedRange}
         onSubmit={handleSubmit}
         isOne={deterimne()}
+        onDelete={handleDelete}
       />
 
       <Sidebar open={openSidebar} setOpen={setOpenSideBar} />

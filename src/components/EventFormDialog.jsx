@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -16,8 +16,18 @@ import RemoveIcon from '@mui/icons-material/Remove';
 const EventFormDialog = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
 
 
-    const [importance,setImportance]=useState(initialData?.importance || 1);
+    const [importance,setImportance]=useState(1);
     const [color,setColor]=useState("");
+
+    useEffect(()=>{
+        if(initialData?.importance!=null){
+            setImportance(initialData.importance);
+        }
+        else{
+            setImportance(1);
+        }
+
+    },[initialData]);
 
     const handleAdd=()=>{
         if(importance<10){
@@ -32,7 +42,6 @@ const EventFormDialog = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}
     
     const handleSubmit = (ev) => {
         ev.preventDefault();
-
         const formData = {
             ...initialData,
             title: ev.target.title.value,
@@ -88,11 +97,11 @@ const EventFormDialog = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}
             <Button type="submit" form="event-form" variant="contained">
                 Save
             </Button>
-            {isOne && (
+            {isOne &&(
                 <Button
                 color="error"
                 variant="contained"
-                onClick={() => onDelete(initialData)}
+                onClick={()=>onDelete(initialData)}
                 >
                 Delete
                 </Button>

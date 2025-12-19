@@ -4,26 +4,28 @@ import Sidebar from './components/Sidebar.jsx'
 import DailyTasks from './components/DailyTasks.jsx'
 import './index.css'
 import MyCalendar from './components/MyCalendar.jsx'
-import { fetchAll } from './taskService.js'
+import { getTasks } from './Services/TaskService.js'
+import { useContext } from 'react'
+import { AuthContext } from './AuthProvider.jsx'
 
-const Home = ({user}) => {
+const Home = () => {
   const navigate = useNavigate();
+  const {user,setUser,loading,setLoading}=useContext(AuthContext);
   const [events, setEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log(user);
+    if (!user?.userId) return;
     const getData = async () => {
       try {
-        setLoading(true);
-        const data = await fetchAll(user);
+        const data = await getTasks(user.token,user.userId);
+        console.log(data);
         if (data.content) {
           setEvents(data.content);
         }
-        setLoading(false);
       } catch (err) {
         console.error('Error fetching events:', err);
         setLoading(false);
-        localStorage.clear();
         navigate("/auth", { replace: true });
       }
     };

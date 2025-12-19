@@ -2,9 +2,11 @@ import React, { Component, useState } from 'react'
 import '../index.css'
 import { Button } from '@mui/material'
 import EventFormDialog from './EventFormDialog'
-import { deleteTask,updateTask } from '../taskService'
+import { deleteTask,updateTask } from '../Services/TaskService.js'
 
 const TaskComponent = (props) => {
+
+  
   const { ev, user ,setEvents,events} = props
 
   const [openForm,setOpenForm]=useState(false);
@@ -24,11 +26,10 @@ const TaskComponent = (props) => {
     setOpenForm(false);
   }
   const handleSubmitForm=async(event)=>{
-
     try{
-      const res=await updateTask(user,event);
+      const res=await updateTask(user.token,user.userId,event.id,event);
       
-      if(res.stats==="good"){
+      if(res.status==="good"){
         const updated=res.content;
         const upEvents=events.map(
           ev=>
@@ -50,8 +51,9 @@ const TaskComponent = (props) => {
 
   const handleDelete = async () => {
     try {
-      const res = await deleteTask(user, ev);
-      if (res.stats == "good") {
+      console.log(ev.id);
+      const res = await deleteTask(user.token,user.userId,ev.id);
+      if (res.status == "good") {
         setEvents(prev => prev.filter(e => e.id !== ev.id));
       }
       setOpenForm(false);

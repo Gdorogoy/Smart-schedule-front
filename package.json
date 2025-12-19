@@ -20,6 +20,7 @@
     "@fullcalendar/timegrid": "^6.1.19",
     "@mui/icons-material": "^7.3.4",
     "@mui/material": "^7.3.4",
+    "@mui/system": "^7.3.6",
     "axios": "^1.13.2",
     "fullcalendar": "^6.1.19",
     "react": "^19.1.1",
