@@ -1,43 +1,26 @@
-import axios from "axios";
+import { sendRequest } from "./AxiosRequestHandler";
 
 const BASE_URL="http://localhost:8000/auth"
 
 
 
 
-export const signup = async (userId,data) => {
-  const res=await axios.post(`${BASE_URL}/signup/${userId}`,
-    {headers: {'Content-Type':'application/json'}}
-  );
-  return res.data;
+export const signup = async (data) => {
+    const res=await sendRequest("POST",`${BASE_URL}/signup`,data,null,null);
+    return res;
 };
 
 export const logout=async(userId)=>{
-    const res = await axios.put(
-    `${BASE_URL}/logout/${userId}`,
-        {headers: {'Content-Type': 'application/json'}}
-        );
-        return res.data;
+    const res=await sendRequest("PUT",`${BASE_URL}/logout/${userId}`,data,null,null);
+    return res;
 };
 
 export const login=async(data)=>{
-    const res= await axios.post(`${BASE_URL}/login`,data,
-        {headers: {'Content-Type': 'application/json',}}
-    );
-    return res.data;
+    const res=await sendRequest("POST",`${BASE_URL}/login/`,data,null,null);
+    return res;
 };
 
-export const refreshToken=async(token)=>{
-    const res= await axios.post(`${BASE_URL}/refresh`,
-        token,
-        {headers:{'Content-Type':'application/json'}}
-        );
-    return res.data;
-}
-
 export const deleteUser = async(userId)=>{
-    const res=await axios.delete(`${BASE_URL}/delete/${userId}`,
-        {headers:{'Content-Type':'application/json'}}
-    );
-    return res.data;
-}
+    const res=await sendRequest("DELETE",`${BASE_URL}/delete/${userId}`,data,null,null);
+    return res;
+};

@@ -5,19 +5,27 @@ import timeGridPlugin from "@fullcalendar/timegrid/index.js";
 import interactionPlugin from "@fullcalendar/interaction/index.js";
 import EventFormDialog from "./EventFormDialog";
 import { createTask, deleteTask, updateTask } from "../Services/TaskService.js";
-import { refreshToken } from "../Services/AuthService.js";
 import Sidebar from "./Sidebar";
 import { useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
+import { getTeams } from '../Services/TeamService';
+
 
 const MyCalendar = ({events,setEvents}) => {
-  const {user,setUser,loading}=useContext(AuthContext);
+  const {user,setUser,loading,logout}=useContext(AuthContext);
   useEffect(() => {
     if (!loading && !user?.token) {
       navigate("/auth", { replace: true });
     }
   }, [user, loading]);
 
+  const teamsTest=async()=>{
+    const res = await getTeams(user.userId, user.token);
+    return res.data;
+  }
+  teamsTest().then(data => {
+    console.log("teams", data);
+  });
 
 
   const [openForm, setOpenForm] = useState(false);
@@ -49,6 +57,13 @@ const MyCalendar = ({events,setEvents}) => {
       }
 
       const res=await createTask(user.token,user.userId,newEv);
+      if(res.logout){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
+      }
 
 
       setEvents([...events,res.content]);
@@ -61,9 +76,14 @@ const MyCalendar = ({events,setEvents}) => {
     if (!selectedEvent?.id) return;
     
     try{
-      const res = await deleteTask(user.token,user.userId,selectedEvent.id);
-      console.log(res);
-
+      const res = await deleteTask(user.token,user.userId,selectedEvent.id,user.refreshToken);
+      if(res.logout){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
+      }
       if(res.status==="good"){
         setEvents(prev =>
           prev.filter(ev => ev.id !== selectedEvent.id)
@@ -97,6 +117,13 @@ const MyCalendar = ({events,setEvents}) => {
     setEvents(updatedEvents);
     try{
       const res=await updateTask(user.token,user.userId,updatedEvent.id,updatedEvent);
+      if(res.logout){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
+      }
     }catch(err){
       console.error(err);
     }
@@ -122,6 +149,13 @@ const MyCalendar = ({events,setEvents}) => {
 
     try{
       const res=await updateTask(user.token,user.userId,updatedEvent.id,updatedEvent);
+      if(res.logout){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
+      }
 
     }catch(err){
       console.error(err);

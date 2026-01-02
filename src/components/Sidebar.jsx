@@ -1,9 +1,13 @@
 import { Button, Drawer, List, ListItem, ListItemText, Box } from '@mui/material';
 import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import GroupsIcon from '@mui/icons-material/Groups';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useContext } from 'react';
+import { AuthContext } from '../AuthProvider';
+import { useNavigate } from 'react-router-dom';
 
 const Sidebar = ({ open, setOpen }) => {
-
+  const navigate=useNavigate();
 
   /*
 
@@ -17,11 +21,9 @@ const Sidebar = ({ open, setOpen }) => {
     setOpen(newOpen);
   };
 
-  const user = {
-    name: localStorage.getItem("name"),
-    email:localStorage.getItem("email")
-  };
+  const {user}=useContext(AuthContext);
 
+  //todo fix here:
 
   const handleLogOut = () => {
     localStorage.removeItem("token");
@@ -33,6 +35,12 @@ const Sidebar = ({ open, setOpen }) => {
 
     window.location.href = "/auth";
   };
+
+  const handleTeams=()=>{
+    console.log("clicked");
+    navigate(`/teams`);
+    // window.location.href="/teams";
+  }
 
   const handleSettings=()=>{
     window.location.href = "/user";
@@ -53,12 +61,6 @@ const Sidebar = ({ open, setOpen }) => {
       >
         <AccountBoxIcon color="primary" sx={{ fontSize: 50 }} />
         <List disablePadding sx={{ width: "100%" }}>
-          <ListItem sx={{ justifyContent: "center", textAlign: "center" }}>
-            <ListItemText
-              primary={user.name}
-              sx={{ textAlign: "center", fontWeight: "bold" }}
-            />
-          </ListItem>
 
           <ListItem sx={{ justifyContent: "center", textAlign: "center" }}>
             <ListItemText
@@ -67,7 +69,18 @@ const Sidebar = ({ open, setOpen }) => {
             />
           </ListItem>
 
-          <ListItem disablePadding sx={{ mt: 2 }}>
+          <ListItem disablePadding sx={{ mt: 1 }}>
+            <Button onClick={handleTeams}
+              variant="contained"
+              color="primary"
+              fullWidth
+              startIcon={<GroupsIcon/>}
+            >
+            Teams
+            </Button>
+          </ListItem>
+
+          <ListItem disablePadding sx={{ mt: 1 }}>
             <Button onClick={handleSettings}
               variant="contained"
               color="primary"

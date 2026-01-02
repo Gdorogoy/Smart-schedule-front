@@ -5,6 +5,9 @@ import ProtectedRoute from "./ProtectedRoute";
 import Home from "./Home.jsx";
 import UserSetting from "./components/UserSetting.jsx";
 import { AuthProvider,AuthContext } from "./AuthProvider.jsx";
+import { TeamComponent } from "./components/TeamComponent.jsx";
+import TeamView from './components/TeamView.jsx'
+
 const App = () => {
 
 
@@ -13,9 +16,6 @@ const App = () => {
     fix task problem, (update git and container)
     add team component
     add colors etc 
-
-    
-
   */
 
 
@@ -26,7 +26,8 @@ const App = () => {
         <Routes>
           <Route path="/calendar" element={<ProtectedRoute><Home/></ProtectedRoute>} />
           <Route path="/user" element={<ProtectedRoute><UserSetting/></ProtectedRoute>} />
-          {/* <Route path="/team" element={<ProtectedRoute > </ProtectedRoute>}></Route> */}
+          <Route path="/teams" element={<ProtectedRoute > <TeamComponent></TeamComponent> </ProtectedRoute>}></Route>
+          <Route path="/team" element={<ProtectedRoute > <TeamView></TeamView> </ProtectedRoute>}></Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Auth />} />
         </Routes>

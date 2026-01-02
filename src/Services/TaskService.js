@@ -1,59 +1,22 @@
-import axios from "axios";
-import { refreshToken } from "./AuthService";
+import { sendRequest } from "./AxiosRequestHandler";
 const BASE_URL = "http://localhost:8000/tasks";
 
-export const getTasks = async (token, userId,longToken) => {
-  let rtoken;
-  let res = await axios.get(`${BASE_URL}/get/${userId}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
-  if(res.status===401){
-    rtoken=await refreshToken(longToken);
-  }
-  await axios.get(`${BASE_URL}/get/${userId}`, {
-    headers: { Authorization: `Bearer ${rtoken}` }
-  });
-
-  return res.data;
+export const getTasks = async (token, userId,refreshToken) => {
+  const res=await sendRequest("GET",`${BASE_URL}/get/${userId}`,null,token,refreshToken);
+  return res;
 };
 
-export const createTask = async (token, userId, taskData) => {
-  let rtoken;
-  let res = await axios.post(
-    `${BASE_URL}/create/${userId}`,
-    taskData,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-
-  if(res.status===401){
-    rtoken=await refreshToken(longToken);
-  }
-  return res.data;
+export const createTask = async (token, userId, data,refreshToken) => {
+  const res=await sendRequest("POST",`${BASE_URL}/create/${userId}`,data,token,refreshToken);
+  return res;
 };
 
-export const updateTask = async (token, userId, taskId, data) => {
-  let rtoken;
-  let res = await axios.put(
-    `${BASE_URL}/update/${userId}/${taskId}`,
-    data,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-
-  if(res.status===401){
-    rtoken=await refreshToken(longToken);
-  }
-  return res.data;
+export const updateTask = async (token, userId, taskId, data,refreshToken) => {
+  const res=await sendRequest("PUT",`${BASE_URL}/update/${userId}/${taskId}`,data,token,refreshToken);
+  return res;
 };
 
-export const deleteTask = async (token, userId, taskId) => {
-  let rtoken;
-  let res = await axios.delete(
-    `${BASE_URL}/delete/${userId}/${taskId}`,
-    { headers: { Authorization: `Bearer ${token}` } }
-  );
-
-  if(res.status===401){
-    rtoken=await refreshToken(longToken);
-  }
-  return res.data;
+export const deleteTask = async (token, userId, taskId ,refreshToken) => {
+  const res=await sendRequest("DELETE",`${BASE_URL}/delete/${userId}/${taskId}`,null,token,refreshToken);
+  return res;
 };

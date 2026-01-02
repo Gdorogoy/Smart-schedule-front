@@ -14,7 +14,7 @@ import { getUser, updateUser } from "../Services/UserService";
 import { AuthContext } from "../AuthProvider";
 
 const UserSetting = () => {
-    const {user,setUser} = useContext(AuthContext);
+    const {user,setUser,logout,updateAccessToken} = useContext(AuthContext);
     const navigate = useNavigate();
     const [edit, setEdit] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -33,8 +33,16 @@ const UserSetting = () => {
         const getUserData = async () => {
             try {
                 setLoading(true);
-                const res = await getUser(user.userId, user.token);
-                const userData = res.content;
+                const res = await getUser(user.userId, user.token,user.refreshToken);
+                console.log(res);
+                if(res.logout){
+                    logout();
+                    return;
+                }
+                if(res.newToken){
+                    updateAccessToken(res.newToken);
+                }
+                const userData = res.data.content;
 
                 setFormData(prev => ({
                     ...prev,
@@ -55,7 +63,7 @@ const UserSetting = () => {
         };
 
         getUserData();
-    }, [user.userId, user.token]);
+    }, [user?.userId]);
 
 
 
@@ -78,7 +86,14 @@ const UserSetting = () => {
         }
 
         try {
-            await updateUser(user.userId, user.token, formData);
+            const res=await updateUser(user.userId, user.token, formData,user.refreshToken);
+            if(res.logout){
+                logout();
+                return;
+            }
+            if(res.newToken){
+                updateAccessToken(res.newToken);
+            }
             alert("Profile updated successfully!");
             setEdit(false);
 

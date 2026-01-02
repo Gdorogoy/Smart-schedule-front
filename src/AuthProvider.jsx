@@ -27,8 +27,23 @@ export const AuthProvider=({children})=>{
 
     },[user]);
 
+    const updateAccessToken=(newToken)=>{
+        setUser(prev=>{
+            if(!prev) return prev;
+            return {
+                ...prev,
+                token:newToken
+            }
+        });
+    }
+
+    const logout=()=>{
+        setUser(null);
+        window.location.replace("/login");
+    }
+
     return(
-        <AuthContext.Provider value={{user,setUser,loading,setLoading}}>
+        <AuthContext.Provider value={{user,setUser,loading,setLoading,logout,updateAccessToken}}>
             {children}
         </AuthContext.Provider>
     );

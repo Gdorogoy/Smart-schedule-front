@@ -54,10 +54,13 @@ const Auth = () => {
       }
 
       if (data?.token) {
+        console.log("isLogin:", isLogin);
+        console.log("data:", data);
+
         setUser({
           token: data.token,
-          userId: data.user.content.userId,
-          email: data.user.content.email,
+          userId: isLogin ? data.user.userId : data.user.id || null,
+          email: data.user.email,
           refreshToken: data.refreshToken,
         });
 

@@ -1,13 +1,15 @@
-import React, { Component, useState } from 'react'
+import React, { Component, useContext, useState } from 'react'
 import '../index.css'
 import { Button } from '@mui/material'
 import EventFormDialog from './EventFormDialog'
 import { deleteTask,updateTask } from '../Services/TaskService.js'
+import { AuthContext } from '../AuthProvider.jsx'
 
 const TaskComponent = (props) => {
 
   
-  const { ev, user ,setEvents,events} = props
+  const { ev,setEvents,events} = props
+  const {user,setUser,loading,logout}=useContext(AuthContext);
 
   const [openForm,setOpenForm]=useState(false);
   const [selectedRange, setSelectedRange] = useState({
@@ -28,20 +30,22 @@ const TaskComponent = (props) => {
   const handleSubmitForm=async(event)=>{
     try{
       const res=await updateTask(user.token,user.userId,event.id,event);
-      
-      if(res.status==="good"){
-        const updated=res.content;
-        const upEvents=events.map(
-          ev=>
-            ev.id===updated.id?
+      if(res.logout){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
+      }
+      const updated=res.content;
+      const upEvents=events.map(
+        ev=>
+          ev.id===updated.id?
             updated 
             :
             ev
         );
-
-
         setEvents(upEvents);
-      }
       setOpenForm(false);
     }catch(err){
       console.error("Update error:", err);
@@ -53,8 +57,12 @@ const TaskComponent = (props) => {
     try {
       console.log(ev.id);
       const res = await deleteTask(user.token,user.userId,ev.id);
-      if (res.status == "good") {
-        setEvents(prev => prev.filter(e => e.id !== ev.id));
+      if(res.logout){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
       }
       setOpenForm(false);
     } catch (err) {
