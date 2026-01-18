@@ -8,25 +8,24 @@ import { createTask, deleteTask, updateTask } from "../Services/TaskService.js";
 import Sidebar from "./Sidebar";
 import { useContext } from "react";
 import { AuthContext } from "../AuthProvider.jsx";
-import { getTeams } from '../Services/TeamService';
+import { getUser } from "../Services/UserService.js";
 
 
 const MyCalendar = ({events,setEvents}) => {
   const {user,setUser,loading,logout}=useContext(AuthContext);
   useEffect(() => {
+    const getUserInfo=async()=>{
+      const res=await getUser(user.userId,user.token,user.refreshToken);
+      setUser(prev => ({
+        ...prev,
+        ...res.data.content,
+      }));
+    }
     if (!loading && !user?.token) {
       navigate("/auth", { replace: true });
     }
-  }, [user, loading]);
-
-  const teamsTest=async()=>{
-    const res = await getTeams(user.userId, user.token);
-    return res.data;
-  }
-  teamsTest().then(data => {
-    console.log("teams", data);
-  });
-
+    getUserInfo();
+  }, [user.userId, loading]);
 
   const [openForm, setOpenForm] = useState(false);
   const [selectedRange, setSelectedRange] = useState(null);
@@ -66,7 +65,7 @@ const MyCalendar = ({events,setEvents}) => {
       }
 
 
-      setEvents([...events,res.content]);
+      setEvents([...events,res.data.content]);
       handleCloseForm();
     }
       

@@ -37,7 +37,7 @@ const TaskComponent = (props) => {
       if(res.newToken){
         updateAccessToken(res.newToken);
       }
-      const updated=res.content;
+      const updated=res.data.content;
       const upEvents=events.map(
         ev=>
           ev.id===updated.id?

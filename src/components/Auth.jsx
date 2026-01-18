@@ -53,15 +53,13 @@ const Auth = () => {
         data = await signup(registerInput);
       }
 
-      if (data?.token) {
-        console.log("isLogin:", isLogin);
+      if (data.data?.token) {
         console.log("data:", data);
 
         setUser({
-          token: data.token,
-          userId: isLogin ? data.user.userId : data.user.id || null,
-          email: data.user.email,
-          refreshToken: data.refreshToken,
+          token: data.data.token,
+          userId: data.data.user.content.userId,
+          refreshToken: data.data.refreshToken,
         });
 
         alert(isLogin ? "Login successful!" : "Signup successful!");

@@ -2,10 +2,6 @@ import '../index.css'
 import TaskComponent from './TaskComponent'
 
 const DailyTasks = ({ events, user,setEvents }) => {
-
-  
-
-
   return (
     <ul className='dailyTask'>
       {events.map(ev=>{

@@ -18,10 +18,9 @@ const Home = () => {
     if (!user?.userId) return;
     const getData = async () => {
       try {
-        const data = await getTasks(user.token,user.userId);
-        console.log(data);
-        if (data.content) {
-          setEvents(data.content);
+        const res = await getTasks(user.token,user.userId);
+        if (res.data.content) {
+          setEvents(res.data.content);
         }
       } catch (err) {
         console.error('Error fetching events:', err);

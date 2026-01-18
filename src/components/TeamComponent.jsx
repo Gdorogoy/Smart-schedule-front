@@ -5,16 +5,19 @@ import React from 'react'
 
 export const TeamComponent = ({data}) => {
     const navigate= useNavigate();
+
     const handleOnClick=()=>{
-        navigate(`/team/${team.id}`, { state: { team } });
-    }
+      navigate(`/team`, { 
+        state: { team:data 
+      }});
+    };
 
   return (
     <div>
-        {/* <Button onClick={handleOnClick}>
-            <h1>{data.teamName}</h1>
-            <h2>{data.teamInfo}</h2>
-        </Button> */}
+        <Button onClick={handleOnClick}>
+            <h1>{data.name}</h1>
+            <h2>{data.description}</h2>
+        </Button>
     </div>
   )
 }

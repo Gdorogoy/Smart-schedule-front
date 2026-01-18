@@ -36,7 +36,6 @@ export const sendRequest = async (method, url, data, token, refreshToken) => {
 };
 
 const refreshTokenFunc=async(refreshToken)=>{
-
     try{
         let res=await axios.post(`http://localhost:8000/auth/refresh`,null,{headers:{Authorization:`Bearer ${refreshToken}`}});
         return res.data.token;

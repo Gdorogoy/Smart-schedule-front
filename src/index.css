@@ -170,3 +170,19 @@
     margin: 20px;
     padding: 0; 
 }
+
+.team{
+    overflow-y: auto;
+    overflow-x: hidden;   
+    height: 100vh;
+    border: 5px solid red;
+    display: grid;
+    grid-template-columns: repeat(9,1fr);
+    grid-template-rows: repeat(9,1fr);
+
+
+}
+
+.team-div-1{
+    border: 5px solid blue;
+}

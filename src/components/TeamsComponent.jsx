@@ -1,29 +1,37 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../AuthProvider';
-import { Stack } from '@mui/material';
+import { Stack, TextField } from '@mui/material';
 import { TeamComponent } from './TeamComponent';
 import { getTeams } from '../Services/TeamService';
 
 const TeamsComponent = () => {
-    const {user}=useContext(AuthContext);
+    const {user,logout,updateAccessToken}=useContext(AuthContext);
     const [teams,setTeams]=useState([]);
 
     useEffect(() => {
     const fetchData = async () => {
         try {
-        // const res = await getTeams(user.userId, user.token,user.refreshToken);
-        // console.log(res);
-        // setTeams(res.content); // now setTeams is actually using the fetched data
-        return 1;
+        const res = await getTeams(user.token,user.refreshToken);
+        
+        if(res.logout){
+            logout();
+            return;
+        }
+        if(res.newToken){
+            updateAccessToken(res.newToken);
+        }
+        setTeams([
+        ...res.data.content.lead,
+        ...res.data.content.member,
+        ]);
+
         } catch (err) {
         console.error("Error fetching teams:", err);
         }
     };
-
     fetchData();
-    }, [user.userId, user.token]); // run only when userId or token changes
+    }, [user.userId]);
 
-    console.log(teams);
     /*
     1) build a list of teams -- done
     2) add fetch teams for user  
@@ -36,12 +44,11 @@ const TeamsComponent = () => {
 
 
     return (
-        <Stack spacing={2}>
-            {/* {teams.map(team=>{
-                <Item>
-                    <TeamComponent data={team}/>
-                </Item>
-            })} */}
+        <Stack spacing={2} alignItems="center" margin="20px">
+            <TextField variant="outlined" sx={{width:200 }}></TextField>
+            {teams.map(t=>{
+                return  <TeamComponent key={t.id} data={t}/>
+            })}
         </Stack>
     );
 }
