@@ -1,9 +1,11 @@
 import React, { Component, useContext, useState } from 'react'
 import '../index.css'
-import { Button } from '@mui/material'
+import { Box, Button, Card, IconButton, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material'
 import EventFormDialog from './EventFormDialog'
 import { deleteTask,updateTask } from '../Services/TaskService.js'
 import { AuthContext } from '../AuthProvider.jsx'
+import EditIcon from "@mui/icons-material/Edit";
+
 
 const TaskComponent = (props) => {
 
@@ -71,15 +73,37 @@ const TaskComponent = (props) => {
   };
 
   return (
-    <>
-      <div className='task'>
-        <div className='task-content'>
-          <div className='task-title'>{ev.title}</div>
-          <div className='task-desc'>{ev.description}</div>
-          <div className='task-import'>Importance: {ev.importance}</div>
-        </div>
-        <Button variant='contained' onClick={handleOpenForm}>Edit</Button>
-      </div>
+    <ListItem sx={{width:'100%'}}>
+        <Card sx={{
+          width:"100%",
+          p:2,
+          borderRadius:2,
+          border:'2px solid blue',
+        }}>
+          <Box sx={{
+            display:'flex',
+            flexDirection:'row',
+            alignItems:'center',
+            justifyContent:'space-between'
+          }}>
+            <Typography sx={{
+              fontWeight:'bold',
+              ml:2
+            }}>  
+                {ev.title}
+            </Typography>
+            <IconButton onClick={handleOpenForm} size='medium'>
+              <EditIcon/>
+            </IconButton>
+          </Box>
+          <Typography color='text.secondery' sx={{ml:2}}>
+              {ev.description}
+          </Typography>
+          <Typography variant="body2" sx={{ml:2}}> 
+              {ev.importance}
+          </Typography>
+
+        </Card>
       <EventFormDialog
         open={openForm}
         onDelete={handleDelete}
@@ -89,7 +113,7 @@ const TaskComponent = (props) => {
         onSubmit={handleSubmitForm}
       />
 
-    </>
+    </ListItem>
   )
 }
 

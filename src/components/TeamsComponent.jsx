@@ -1,12 +1,17 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { AuthContext } from '../AuthProvider';
-import { Stack, TextField } from '@mui/material';
+import { Autocomplete, Box, Button, List, Stack, TextField } from '@mui/material';
 import { TeamComponent } from './TeamComponent';
 import { getTeams } from '../Services/TeamService';
+import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
+import GroupsIcon from '@mui/icons-material/Groups';
+import Sidebar from './Sidebar';
 
 const TeamsComponent = () => {
     const {user,logout,updateAccessToken}=useContext(AuthContext);
     const [teams,setTeams]=useState([]);
+    const [openSidebar, setOpenSideBar] = useState(false);
+    
 
     useEffect(() => {
     const fetchData = async () => {
@@ -32,9 +37,14 @@ const TeamsComponent = () => {
     fetchData();
     }, [user.userId]);
 
+    const toggleDrawer = () => {
+        setOpenSideBar(prev => !prev);
+    };
+
+
     /*
     1) build a list of teams -- done
-    2) add fetch teams for user  
+    2) add fetch teams for user  --done
     3) add search team by name
     4) add join team 
     5) add filter teams
@@ -44,12 +54,34 @@ const TeamsComponent = () => {
 
 
     return (
-        <Stack spacing={2} alignItems="center" margin="20px">
-            <TextField variant="outlined" sx={{width:200 }}></TextField>
-            {teams.map(t=>{
-                return  <TeamComponent key={t.id} data={t}/>
-            })}
-        </Stack>
+        <>
+            <Box sx={{display:'flex' , flexDirection:'row-start' , m:4}}> 
+
+
+                <Button sx={{mb:4}} variant='contained' onClick={toggleDrawer} >
+                    <FormatAlignJustifyIcon size='large'></FormatAlignJustifyIcon>
+                </Button>
+
+                <Autocomplete sx={{ mb:4,ml:2 ,width:'45%'}}
+                options={teams.map((t)=>t.name)}
+                freeSolo
+                renderInput={(params=> <TextField {...params} label='searchTeams'/>)}
+                >
+                </Autocomplete>
+
+            </Box>
+            <Stack spacing={2} alignItems="center" margin="20px">
+            <List>
+                 {teams.map(t=>{
+                    return  <TeamComponent key={t.id} data={t}/>
+                })}
+            </List>
+            </Stack>
+            <Sidebar open={openSidebar} setOpen={setOpenSideBar} />
+
+        
+                
+        </>
     );
 }
 

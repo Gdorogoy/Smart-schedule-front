@@ -7,6 +7,7 @@ import UserSetting from "./components/UserSetting.jsx";
 import { AuthProvider,AuthContext } from "./AuthProvider.jsx";
 import TeamView from './components/TeamView.jsx'
 import TeamsComponent from "./components/TeamsComponent.jsx";
+import { CssBaseline } from "@mui/material";
 
 const App = () => {
 
@@ -21,6 +22,7 @@ const App = () => {
 
   return (
     <AuthProvider>
+      <CssBaseline></CssBaseline>
       <Router>
         <Routes>
           <Route path="/calendar" element={<ProtectedRoute><Home/></ProtectedRoute>} />
