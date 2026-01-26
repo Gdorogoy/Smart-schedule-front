@@ -1,18 +1,18 @@
 import { Button, TextField } from "@mui/material";
 import { Box, Stack } from "@mui/system";
 import React, { useEffect, useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { login, signup } from '../Services/AuthService.js';
+import { data, useNavigate } from "react-router-dom";
+import { loginRequest, signup } from '../Services/AuthService.js';
 import { AuthContext } from "../AuthProvider.jsx";
 const Auth = () => {
-  const { user, setUser } = useContext(AuthContext);
+  const { user, setUser,auth,login } = useContext(AuthContext);
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (user?.token) {
+  if (auth?.token) {
       navigate("/calendar", { replace: true });
     }
-  }, [user, navigate]);
+  }, [auth]);
 
   const [loginInput, setLoginInput] = useState({
     email: "",
@@ -41,32 +41,32 @@ const Auth = () => {
     e.preventDefault();
 
     try {
-      let data;
+      let res;
 
       if (isLogin) {
-        data = await login(loginInput);
+        res = await loginRequest(loginInput);
       } else {
         if (pass !== registerInput.password) {
           alert("Passwords should match");
           return;
         }
-        data = await signup(registerInput);
+        res = await signup(registerInput);
       }
-
-      if (data.data?.token) {
-        console.log("data:", data);
-
-        setUser({
-          token: data.data.token,
-          userId: data.data.user.content.userId,
-          refreshToken: data.data.refreshToken,
+      if (res.data?.token) {
+        
+        login({
+          token: res.data.token,
+          userId:res.data.user.userId,
+          refreshToken: res.data.refreshToken,
         });
+
+        setUser(res.data.user);
 
         alert(isLogin ? "Login successful!" : "Signup successful!");
         navigate("/calendar", { replace: true });
 
       } else {
-        console.error("No token in response:", data);
+        console.error("No token in response:", res);
         alert("No token received from server.");
       }
     } catch (error) {

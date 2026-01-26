@@ -11,12 +11,11 @@ import GroupsIcon from '@mui/icons-material/Groups';
 
 const TeamView = () => {
   const [team, setTeam] = useState(null);
-  const { user, updateAccessToken, logout } = useContext(AuthContext);
+  const { user, updateAccessToken, logout ,auth} = useContext(AuthContext);
   const { state } = useLocation();
   const [openSidebar, setOpenSideBar] = useState(false);
   const [teamTasks, setTeamTasks] = useState([]);
   const navigate= useNavigate();
-
 
   useEffect(() => {
     if (!state?.team?.id) {
@@ -24,7 +23,7 @@ const TeamView = () => {
     }
     const getTeamInfo = async () => {
       try {
-        const res = await getTeam(user.token, user.refreshToken, state.team.id);
+        const res = await getTeam(auth.token, auth.refreshToken, state.team.id);
         if (res.logout) {
           logout();
           return;
@@ -170,6 +169,10 @@ export default TeamView;
     2.1 : team leads can see how many task each member have(in the team scope)
     2.2: 
 
+
+
+    ======
+    add condiditonal rendering (pass from backend what allowed and whats not )
 
 */
 

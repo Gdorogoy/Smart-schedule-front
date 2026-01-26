@@ -11,7 +11,8 @@ export const sendRequest = async (method, url, data, token, refreshToken) => {
         return { data: res.data };
 
     } catch (err) {
-        if (err.response?.status === 403) {
+        try{
+            if (err.response?.status === 403) {
             const newToken = await refreshTokenFunc(refreshToken);
 
             const retry = await axios({
@@ -20,18 +21,19 @@ export const sendRequest = async (method, url, data, token, refreshToken) => {
                 data,
                 headers: { Authorization: `Bearer ${newToken}` , 'Content-Type': 'application/json'},
             });
-
             return {
                 data: retry.data,
                 newToken,
             };
+            }
+            if (err.response?.status === 401) {
+                return "logout";
+            }
+        }catch(err){
+            return "logout";
         }
 
-        if (err.response?.status === 401) {
-            return { logout: true };
-        }
-
-        throw err;
+        return "logout";
     }
 };
 
@@ -40,9 +42,6 @@ const refreshTokenFunc=async(refreshToken)=>{
         let res=await axios.post(`http://localhost:8000/auth/refresh`,null,{headers:{Authorization:`Bearer ${refreshToken}`}});
         return res.data.token;
     }catch(err){
-        if(err.response?.status===401){
-            return "logout";            
-        }
-        throw err;
+        return "logout";
     }
 }

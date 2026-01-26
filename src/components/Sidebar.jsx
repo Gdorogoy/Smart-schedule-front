@@ -5,6 +5,7 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import { useContext } from 'react';
 import { AuthContext } from '../AuthProvider';
 import { useNavigate } from 'react-router-dom';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const Sidebar = ({ open, setOpen }) => {
   const navigate=useNavigate();
@@ -21,30 +22,28 @@ const Sidebar = ({ open, setOpen }) => {
     setOpen(newOpen);
   };
 
-  const {user}=useContext(AuthContext);
-
+  const {user,auth,logout}=useContext(AuthContext);
   //todo fix here:
 
   const handleLogOut = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("email");
-    localStorage.removeItem("name");
-    localStorage.clear();
-
-    window.location.href = "/auth";
+    logout();
+    navigate("/auth");
   };
 
   const handleTeams=()=>{
-    console.log("clicked");
     navigate(`/teams`);
     // window.location.href="/teams";
   }
 
   const handleSettings=()=>{
-    window.location.href = "/user";
+    navigate("/user");
   }
+
+  const handleClendar=()=>{
+    navigate("/calendar");
+  }
+
+
 
 
   return (
@@ -67,6 +66,18 @@ const Sidebar = ({ open, setOpen }) => {
               primary={user.email}
               sx={{ textAlign: "center", color: "text.secondary", fontSize: "0.9rem" }}
             />
+          </ListItem>
+
+          <ListItem disablePadding sx={{mt:1}}> 
+            <Button onClick={handleClendar}
+              variant="contained"
+              color="primary"
+              fullWidth
+              startIcon={<CalendarMonthIcon/>}  
+            
+            >
+            Calendar
+            </Button>
           </ListItem>
 
           <ListItem disablePadding sx={{ mt: 1 }}>

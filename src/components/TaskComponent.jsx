@@ -11,7 +11,7 @@ const TaskComponent = (props) => {
 
   
   const { ev,setEvents,events} = props
-  const {user,setUser,loading,logout}=useContext(AuthContext);
+  const {user,setUser,loading,logout,auth}=useContext(AuthContext);
 
   const [openForm,setOpenForm]=useState(false);
   const [selectedRange, setSelectedRange] = useState({
@@ -31,8 +31,8 @@ const TaskComponent = (props) => {
   }
   const handleSubmitForm=async(event)=>{
     try{
-      const res=await updateTask(user.token,user.userId,event.id,event);
-      if(res.logout){
+      const res=await updateTask(auth.token,auth.userId,event.id,event);
+      if(res==="logout"){
         logout();
         return;
       }
@@ -58,8 +58,8 @@ const TaskComponent = (props) => {
   const handleDelete = async () => {
     try {
       console.log(ev.id);
-      const res = await deleteTask(user.token,user.userId,ev.id);
-      if(res.logout){
+      const res = await deleteTask(auth.token,auth.userId,ev.id);
+      if(res==="logout"){
         logout();
         return;
       }

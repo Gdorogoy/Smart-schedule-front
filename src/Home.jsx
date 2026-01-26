@@ -10,15 +10,13 @@ import { AuthContext } from './AuthProvider.jsx'
 
 const Home = () => {
   const navigate = useNavigate();
-  const {user,setUser,loading,setLoading}=useContext(AuthContext);
+  const {user,logout,loading,setLoading,auth}=useContext(AuthContext);
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    console.log(user);
-    if (!user?.userId) return;
     const getData = async () => {
       try {
-        const res = await getTasks(user.token,user.userId);
+        const res = await getTasks(auth.token,auth.userId);
         if (res.data.content) {
           setEvents(res.data.content);
         }
@@ -30,7 +28,7 @@ const Home = () => {
     };
 
     getData();
-  }, [user.userId]);
+  }, [user]);
 
   if (loading) {
     return <div>Loading...</div>;

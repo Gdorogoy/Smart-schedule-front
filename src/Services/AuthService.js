@@ -10,12 +10,12 @@ export const signup = async (data) => {
     return res;
 };
 
-export const logout=async(userId)=>{
+export const logoutRequest=async(userId)=>{
     const res=await sendRequest("PUT",`${BASE_URL}/logout/${userId}`,data,null,null);
     return res;
 };
 
-export const login=async(data)=>{
+export const loginRequest=async(data)=>{
     const res=await sendRequest("POST",`${BASE_URL}/login/`,data,null,null);
     return res;
 };

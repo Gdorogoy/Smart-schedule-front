@@ -5,7 +5,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import Home from "./Home.jsx";
 import UserSetting from "./components/UserSetting.jsx";
 import { AuthProvider,AuthContext } from "./AuthProvider.jsx";
-import TeamView from './components/TeamView.jsx'
+import TeamViewMember from './components/TeamView.jsx'
 import TeamsComponent from "./components/TeamsComponent.jsx";
 import { CssBaseline } from "@mui/material";
 
@@ -28,7 +28,7 @@ const App = () => {
           <Route path="/calendar" element={<ProtectedRoute><Home/></ProtectedRoute>} />
           <Route path="/user" element={<ProtectedRoute><UserSetting/></ProtectedRoute>} />
           <Route path="/teams" element={<ProtectedRoute > <TeamsComponent></TeamsComponent>  </ProtectedRoute>}></Route>
-          <Route path="/team" element={<ProtectedRoute > <TeamView></TeamView> </ProtectedRoute>}></Route>
+          <Route path="/team" element={<ProtectedRoute > <TeamViewMember></TeamViewMember> </ProtectedRoute>}></Route>
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={<Auth />} />
         </Routes>

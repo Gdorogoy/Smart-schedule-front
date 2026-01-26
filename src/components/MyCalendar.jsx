@@ -12,20 +12,15 @@ import { getUser } from "../Services/UserService.js";
 
 
 const MyCalendar = ({events,setEvents}) => {
-  const {user,setUser,loading,logout}=useContext(AuthContext);
+  const {user,setUser,loading,logout,auth}=useContext(AuthContext);
   useEffect(() => {
-    const getUserInfo=async()=>{
-      const res=await getUser(user.userId,user.token,user.refreshToken);
-      setUser(prev => ({
-        ...prev,
-        ...res.data.content,
-      }));
-    }
-    if (!loading && !user?.token) {
+    if (loading) return;
+
+    if (!auth?.token) {
       navigate("/auth", { replace: true });
+      return;
     }
-    getUserInfo();
-  }, [user.userId, loading]);
+  }, [auth.userId, loading]);
 
   const [openForm, setOpenForm] = useState(false);
   const [selectedRange, setSelectedRange] = useState(null);
@@ -55,8 +50,8 @@ const MyCalendar = ({events,setEvents}) => {
         importance:data.importance
       }
 
-      const res=await createTask(user.token,user.userId,newEv);
-      if(res.logout){
+      const res=await createTask(auth.token,auth.userId,newEv);
+      if(res==="logout"){
         logout();
         return;
       }
@@ -75,8 +70,8 @@ const MyCalendar = ({events,setEvents}) => {
     if (!selectedEvent?.id) return;
     
     try{
-      const res = await deleteTask(user.token,user.userId,selectedEvent.id,user.refreshToken);
-      if(res.logout){
+      const res = await deleteTask(auth.token,auth.userId,selectedEvent.id,auth.refreshToken);
+      if(res==="logout"){
         logout();
         return;
       }
@@ -91,7 +86,7 @@ const MyCalendar = ({events,setEvents}) => {
       
       handleCloseForm();
     }catch(err){
-      console.log(err);
+      console.error(err);
       return err;
     }
   };
@@ -115,7 +110,7 @@ const MyCalendar = ({events,setEvents}) => {
     });
     setEvents(updatedEvents);
     try{
-      const res=await updateTask(user.token,user.userId,updatedEvent.id,updatedEvent);
+      const res=await updateTask(auth.token,auth.userId,updatedEvent.id,updatedEvent);
       if(res.logout){
         logout();
         return;
@@ -147,8 +142,8 @@ const MyCalendar = ({events,setEvents}) => {
     setEvents(updatedEvents);
 
     try{
-      const res=await updateTask(user.token,user.userId,updatedEvent.id,updatedEvent);
-      if(res.logout){
+      const res=await updateTask(auth.token,auth.userId,updatedEvent.id,updatedEvent);
+      if(res==="logout"){
         logout();
         return;
       }

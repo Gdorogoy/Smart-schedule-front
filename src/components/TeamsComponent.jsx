@@ -8,7 +8,7 @@ import GroupsIcon from '@mui/icons-material/Groups';
 import Sidebar from './Sidebar';
 
 const TeamsComponent = () => {
-    const {user,logout,updateAccessToken}=useContext(AuthContext);
+    const {user,logout,updateAccessToken,auth}=useContext(AuthContext);
     const [teams,setTeams]=useState([]);
     const [openSidebar, setOpenSideBar] = useState(false);
     
@@ -16,9 +16,9 @@ const TeamsComponent = () => {
     useEffect(() => {
     const fetchData = async () => {
         try {
-        const res = await getTeams(user.token,user.refreshToken);
-        
-        if(res.logout){
+        const res = await getTeams(auth.token,auth.refreshToken);
+
+        if(res==="logout"){
             logout();
             return;
         }
@@ -31,6 +31,8 @@ const TeamsComponent = () => {
         ]);
 
         } catch (err) {
+        console.log("res:")
+        console.log(err)
         console.error("Error fetching teams:", err);
         }
     };
@@ -45,7 +47,7 @@ const TeamsComponent = () => {
     /*
     1) build a list of teams -- done
     2) add fetch teams for user  --done
-    3) add search team by name
+    3) add search team by name --done 
     4) add join team 
     5) add filter teams
 

@@ -14,7 +14,7 @@ import { getUser, updateUser } from "../Services/UserService";
 import { AuthContext } from "../AuthProvider";
 
 const UserSetting = () => {
-    const {user,setUser,logout,updateAccessToken} = useContext(AuthContext);
+    const {user,setUser,logout,updateAccessToken,auth} = useContext(AuthContext);
     const navigate = useNavigate();
     const [edit, setEdit] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -30,40 +30,28 @@ const UserSetting = () => {
 
 
     useEffect(() => {
-        const getUserData = async () => {
-            try {
-                setLoading(true);
-                const res = await getUser(user.userId, user.token,user.refreshToken);
-                console.log(res);
-                if(res.logout){
-                    logout();
-                    return;
-                }
-                if(res.newToken){
-                    updateAccessToken(res.newToken);
-                }
-                const userData = res.data.content;
+        if(!auth.token){
+            logout();
+            return
+        }
+        const loadUserData=()=>{
+            setLoading(true);
+            const userData = user;
+            setFormData(prev => ({
+                ...prev,
+                firstName: userData.firstname || "",
+                lastName: userData.lastname || "",
+                email: userData.email || "",
+                timeZone: userData.timeZone || "",
+                ogPassword: "",
+                newPassword: "",
+                confirmPassword: ""
+            }));
+            setLoading(false);  
+        }
 
-                setFormData(prev => ({
-                    ...prev,
-                    firstName: userData.firstname || "",
-                    lastName: userData.lastname || "",
-                    email: userData.email || "",
-                    timeZone: userData.timeZone || "",
-                    ogPassword: "",
-                    newPassword: "",
-                    confirmPassword: ""
-                }));
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-                alert("Failed to load user data");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        getUserData();
-    }, [user?.userId]);
+        loadUserData();
+    }, [auth?.userId]);
 
 
 
@@ -86,7 +74,7 @@ const UserSetting = () => {
         }
 
         try {
-            const res=await updateUser(user.userId, user.token, formData,user.refreshToken);
+            const res=await updateUser(auth.userId, auth.token, formData,auth.refreshToken);
             if(res.logout){
                 logout();
                 return;
