@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
+import TaskForm from "./TaskForm";
 
 
 const EventFormDialog = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
@@ -58,37 +59,12 @@ const EventFormDialog = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}
             {"Task details"}
         </DialogTitle>
         <DialogContent>
-            <Box component="form" onSubmit={handleSubmit} id="event-form">
-                <Stack spacing={2} sx={{ mt: 1 }}>
-                    <TextField
-                    label="Title"
-                    name="title"
-                    fullWidth
-                    defaultValue={initialData?.title || ""}
-                    required
-                    />
-                    <TextField
-                    label="Description"
-                    name="description"
-                    fullWidth
-                    multiline
-                    defaultValue={initialData?.description || ""}
-                    required
-                    />
-                    <Stack direction={"row"} spacing={2}>
-                    <Button variant="contained" onClick={handleAdd}>
-                        <AddIcon/>
-                    </Button>
-                    <div label="">
-                        importance:{importance}
-                    </div>
-                    <Button variant="contained" onClick={handleMinus}>
-                        <RemoveIcon/>
-                    </Button>
-                    </Stack>
-                    
-                </Stack>
-            </Box>
+            <TaskForm 
+                onDelete={onDelete}
+                initialData={initialData}
+                onSubmit={onSubmit}
+            
+            />
         </DialogContent>
         <DialogActions>
             <Button onClick={onClose} variant="outlined">

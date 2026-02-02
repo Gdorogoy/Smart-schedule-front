@@ -13,7 +13,7 @@ export const TeamComponent = ({data}) => {
     };
 
   return (
-    <ListItem>
+    <ListItem >
       <Button onClick={handleOnClick}>  
         <Stack spacing={2}>
             <Typography variant='h5' sx={{fontWeight:'bold'}}>{data.name}</Typography>

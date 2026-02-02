@@ -1,21 +1,25 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { getTeam } from '../Services/TeamService';
-import { AuthContext } from '../AuthProvider';
+import { getTeam } from '../../Services/TeamService';
+import { AuthContext } from '../../AuthProvider';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, List, Stack, Typography } from '@mui/material';
-import Sidebar from './Sidebar';
-import DisplayTeamMember from './DisplayTeamMember';
-import TaskComponent from './TaskComponent';
+import Sidebar from '../Sidebar';
+import TaskComponent from '../Task/TaskComponent';
 import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
 import GroupsIcon from '@mui/icons-material/Groups';
+import { TaskModalTeams } from '../Task/TaskModalTeams';
+import DisplayTeamMember from '../Teams/DisplayTeamMember'
+import EventFormDialog from '../Task/EventFormDialog';
 
 const TeamView = () => {
   const [team, setTeam] = useState(null);
   const { user, updateAccessToken, logout ,auth} = useContext(AuthContext);
   const { state } = useLocation();
   const [openSidebar, setOpenSideBar] = useState(false);
+  const [openTasks,setOpenTask]=useState(false);
   const [teamTasks, setTeamTasks] = useState([]);
   const navigate= useNavigate();
+
 
   useEffect(() => {
     if (!state?.team?.id) {
@@ -46,12 +50,74 @@ const TeamView = () => {
     setOpenSideBar(prev => !prev);
   };
 
+  const toggleTask=()=>{
+    setOpenTask(prev => !prev);
+  }
+
   const handleGoBack=()=>{
     navigate('/teams');
   }
 
+  const getMembersAutoInfo = () => {
+    console.log(team)
+    const teamMembers = [
+      ...team.teamLeads.map(t => ({ id: t.id, firstname: t.firstname, lastname: t.lastname })),
+      ...team.members.map(m => ({ id: m.id, firstname: m.firstname, lastname: m.lastname }))
+    ];
+    return teamMembers;
+  };
+
+  const members = getMembersAutoInfo();
+
+
+
+  const handleSubmit=async(data)=>{
+      if (selectedEvent) {
+  
+        const updatedEvents=
+        events.map(ev =>
+          ev.id === selectedEvent.id
+            ? { ...ev, title: data.title, description: data.description ,importance:data.importance}
+            : ev
+        );
+        setEvents(updatedEvents);
+        handleCloseForm();
+  
+      } else {
+        const newEv={
+          title:data.title,
+          description:data.description,
+          start:data.start,
+          end:data.end,
+          importance:data.importance
+        }
+  
+        const res=await createTask(auth.token,auth.userId,newEv);
+        if(res==="logout"){
+          logout();
+          return;
+        }
+        if(res.newToken){
+          updateAccessToken(res.newToken);
+        }
+  
+  
+        setEvents([...events,res.data.content]);
+        handleCloseForm();
+      }
+        
+    }
+
+    const handleCloseForm=()=>{
+      setOpenTask(false);
+    }
+
+
+
+
   return (
-    <Box sx={{ 
+    <>
+      <Box sx={{ 
       width: '100%',
       minHeight: '100vh',
       p: 3,
@@ -72,10 +138,19 @@ const TeamView = () => {
         <GroupsIcon size='large'></GroupsIcon>
       </Button>
 
-
-        <Typography variant="h5" sx={ { ml:5, fontWeight: 'bold' ,display:'flex' , justifyContent:'center'}}>
+      <Button
+        sx={{
+          ml: 7,mb:4,textTransform: "none",   padding: 0,color:'black'}} >
+        <Typography
+          variant="h5"
+          sx={{ fontWeight: "bold" }}
+        >
           {team.name}
         </Typography>
+      </Button>
+
+
+
 
       </Box>
 
@@ -129,11 +204,18 @@ const TeamView = () => {
 
         <Box sx={{ 
           width: '70%',
-          flexShrink: 0
+          flexShrink: 0,
+          display:'flex',
+          flexDirection:'row',
+
         }}>
           <Typography variant="h5" sx={{ mb: 3 }}>
             Tasks
           </Typography>
+          <Button variant="contained" sx={{ fontWeight: "bold", mb: 3, ml: 4 ,whiteSpace: "nowrap"}} onClick={toggleTask}>
+            Assign Task
+          </Button>
+
           
           <List sx={{ width: '100%', p: 0 }}>
             {teamTasks.map(t => (
@@ -143,6 +225,7 @@ const TeamView = () => {
                 user={user} 
                 events={teamTasks}
                 setEvents={setTeamTasks} 
+                isTeam={true}
               />
             ))}
           </List>
@@ -151,10 +234,25 @@ const TeamView = () => {
 
       <Sidebar open={openSidebar} setOpen={setOpenSideBar} />
     </Box>
+
+    {/* <EventFormDialog open={openTasks} onClose={handleCloseForm} onSubmit={handleSubmit}/> */}
+    <TaskModalTeams 
+    open={openTasks} 
+    onClose={handleCloseForm} 
+    members={members} 
+    user={user} 
+    updateAccessToken={updateAccessToken} 
+    auth={auth}
+    teamId={team.id}/>
+
+    </>
   );
 }
 
 export default TeamView;
+
+
+
 
 //        <Button onClick={toggleDrawer} sx={{padding:2, margin:5,fontWeight:500 ,width:'8%',height:'5vh'}} variant='contained'> button</Button>
 

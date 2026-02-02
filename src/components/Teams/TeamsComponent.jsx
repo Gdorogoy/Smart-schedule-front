@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { AuthContext } from '../AuthProvider';
+import { AuthContext } from '../../AuthProvider';
 import { Autocomplete, Box, Button, List, Stack, TextField } from '@mui/material';
 import { TeamComponent } from './TeamComponent';
-import { getTeams } from '../Services/TeamService';
+import { getTeams } from '../../Services/TeamService';
 import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
 import GroupsIcon from '@mui/icons-material/Groups';
-import Sidebar from './Sidebar';
+import Sidebar from '../Sidebar';
 
 const TeamsComponent = () => {
     const {user,logout,updateAccessToken,auth}=useContext(AuthContext);

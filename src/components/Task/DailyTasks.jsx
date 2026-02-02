@@ -1,5 +1,5 @@
 import { List } from '@mui/material'
-import '../index.css'
+import '../../index.css'
 import TaskComponent from './TaskComponent'
 
 const DailyTasks = ({ events, user,setEvents }) => {

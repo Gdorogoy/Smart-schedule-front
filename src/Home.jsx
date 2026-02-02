@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar.jsx'
-import DailyTasks from './components/DailyTasks.jsx'
 import './index.css'
-import MyCalendar from './components/MyCalendar.jsx'
+import MyCalendar from './components/User/MyCalendar.jsx'
+import DailyTask from './components/Task/DailyTasks.jsx'
 import { getTasks } from './Services/TaskService.js'
 import { useContext } from 'react'
 import { AuthContext } from './AuthProvider.jsx'
@@ -40,7 +40,7 @@ const Home = () => {
         <MyCalendar events={events} setEvents={setEvents} user={user}/>
       </div>
       <div className='div4'>
-        <DailyTasks
+        <DailyTask
           events={events}
           setEvents={setEvents}
           user={user}

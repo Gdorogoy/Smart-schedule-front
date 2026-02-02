@@ -3,12 +3,12 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid/index.js";
 import timeGridPlugin from "@fullcalendar/timegrid/index.js";
 import interactionPlugin from "@fullcalendar/interaction/index.js";
-import EventFormDialog from "./EventFormDialog";
-import { createTask, deleteTask, updateTask } from "../Services/TaskService.js";
-import Sidebar from "./Sidebar";
+import EventFormDialog from "../Task/EventFormDialog.jsx";
+import { createTask, deleteTask, updateTask } from "../../Services/TaskService.js";
+import Sidebar from "../Sidebar.jsx";
 import { useContext } from "react";
-import { AuthContext } from "../AuthProvider.jsx";
-import { getUser } from "../Services/UserService.js";
+import { AuthContext } from "../../AuthProvider.jsx";
+import { getUser } from "../../Services/UserService.js";
 
 
 const MyCalendar = ({events,setEvents}) => {
@@ -66,11 +66,12 @@ const MyCalendar = ({events,setEvents}) => {
       
   }
 
-  const handleDelete = async () => {
+  const handleDelete = async (taskToDelete) => {
     if (!selectedEvent?.id) return;
-    
     try{
       const res = await deleteTask(auth.token,auth.userId,selectedEvent.id,auth.refreshToken);
+      console.log(res);
+
       if(res==="logout"){
         logout();
         return;
@@ -78,7 +79,7 @@ const MyCalendar = ({events,setEvents}) => {
       if(res.newToken){
         updateAccessToken(res.newToken);
       }
-      if(res.status==="good"){
+      if(res.data.status==="good"){
         setEvents(prev =>
           prev.filter(ev => ev.id !== selectedEvent.id)
       );

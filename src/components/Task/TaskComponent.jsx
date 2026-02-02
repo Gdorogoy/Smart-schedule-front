@@ -1,16 +1,15 @@
 import React, { Component, useContext, useState } from 'react'
-import '../index.css'
 import { Box, Button, Card, IconButton, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material'
 import EventFormDialog from './EventFormDialog'
-import { deleteTask,updateTask } from '../Services/TaskService.js'
-import { AuthContext } from '../AuthProvider.jsx'
 import EditIcon from "@mui/icons-material/Edit";
+import { deleteTask, updateTask } from '../../Services/TaskService.js';
+import { AuthContext } from '../../AuthProvider.jsx';
 
 
-const TaskComponent = (props) => {
+const TaskComponent = (props ) => {
 
   
-  const { ev,setEvents,events} = props
+  const { ev,setEvents,events,isTeam} = props
   const {user,setUser,loading,logout,auth}=useContext(AuthContext);
 
   const [openForm,setOpenForm]=useState(false);
@@ -18,6 +17,12 @@ const TaskComponent = (props) => {
     start:ev.start,
     end:ev.end
   });
+
+  const colors={
+    red:'#E0370E',
+    yellow:'#F2E75A',
+    green:'#71FA6C'
+  }
 
   const initialData={...ev,selectedRange};
   
@@ -57,7 +62,6 @@ const TaskComponent = (props) => {
 
   const handleDelete = async () => {
     try {
-      console.log(ev.id);
       const res = await deleteTask(auth.token,auth.userId,ev.id);
       if(res==="logout"){
         logout();
@@ -66,19 +70,60 @@ const TaskComponent = (props) => {
       if(res.newToken){
         updateAccessToken(res.newToken);
       }
+      setEvents(prev =>
+          prev.filter(ee => ee.id !== ev.id)
+      );
       setOpenForm(false);
+
     } catch (err) {
       console.error("Delete error:", err);
     }
   };
 
+  const getTaskTime=()=>{
+    const end=new Date(ev.end).getTime();
+    const start=new Date(ev.start).getTime();
+    const now=new Date();
+    const curr=now.getTime();
+
+    const total=end-start;
+    const left=curr-start;
+
+    if(left<0){
+      return {state:"not started",progress:0};
+    }
+
+    const progress=left/total;
+
+    if(progress>=1){
+      return {state:"overdue",progress:1}
+    }
+    else {
+      return {state:"in progress",progress}
+    }
+
+  }
+
+   const handleFindColor = () => {
+      if(isTeam){
+        const { progress } = getTaskTime();
+        console.log(progress)
+        if (progress < 0.5) return colors.green;
+        if (progress < 0.75) return colors.yellow;
+        return colors.red;
+      }
+    };
+
+
+
   return (
-    <ListItem sx={{width:'100%'}}>
+    <ListItem sx={{width:'100%',}}>
         <Card sx={{
           width:"100%",
           p:2,
           borderRadius:2,
           border:'2px solid blue',
+          backgroundColor:handleFindColor()
         }}>
           <Box sx={{
             display:'flex',

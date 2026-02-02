@@ -10,8 +10,8 @@ import {
   Paper,
   CircularProgress,
 } from "@mui/material";
-import { getUser, updateUser } from "../Services/UserService";
-import { AuthContext } from "../AuthProvider";
+import { getUser, updateUser } from "../../Services/UserService";
+import { AuthContext } from "../../AuthProvider";
 
 const UserSetting = () => {
     const {user,setUser,logout,updateAccessToken,auth} = useContext(AuthContext);

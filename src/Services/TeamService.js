@@ -12,6 +12,11 @@ export const getTeam=async(token,refreshToken,teamId)=>{
   return res;
 }
 
+export const assignTaskToTeam=async(token,refreshToken,teamId,data)=>{
+  const res=await sendRequest("PUT",`${BASE_URL}/assign/${teamId}`,data,token,refreshToken);
+  return res;
+}
+
 
 //  todo :::: 
 // 3) add auto access token update when updated from backend (used refresh token);
