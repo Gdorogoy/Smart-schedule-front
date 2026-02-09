@@ -1,21 +1,69 @@
-import {Autocomplete, Dialog, DialogContent, Stack, TextField, Typography, Checkbox, Box, DialogActions, Button} from '@mui/material'
-import React from 'react'
+import {Autocomplete, Dialog, DialogContent, Stack, TextField, Typography, Checkbox, Box, DialogActions, Button, Container} from '@mui/material'
+import React, { useMemo, useState } from 'react'
 import TaskForm from './TaskForm';
 import { assignTaskToTeam } from '../../Services/TeamService';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
+import Calendar from '../calendar/calendar';
 
-export const TaskModalTeams = ({ open, onClose, members, user,auth,updateAccessToken,teamId }) => {
-  const [selectedUsers, setSelectedUsers] = React.useState([]);
-  const [searchValue, setSearchValue] = React.useState(null);
+export const TaskModalTeams = ({ open, onClose, members, user, auth, updateAccessToken, teamId }) => {
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [searchValue, setSearchValue] = useState(null);
+  
+  const [startDate, setStartDate] = useState(dayjs());
+  const [endDate, setEndDate] = useState(dayjs().add(1, 'hour'));
+  const [dueDate, setDueDate] = useState(dayjs().add(1, 'day'));
+  const [taskData, setTaskData] = useState({
+    title:"",
+    description:"",
+    importance:1,
+    start:startDate,
+    end:endDate,
+    dueDate:endDate,
+    color:null,
+    status:"pending",
+    team:null,
+  });
 
 
-  const createTeamTask=async()=>{
-    const data=selectedUsers.map(u=>u.id);
-    const res=await assignTaskToTeam(auth.token,auth.refreshToken,teamId, { users: data });
-    console.log(res);
-    onClose()
+  const close = () => {
+    onClose();
+    setSelectedUsers([]);
+    setStartDate(dayjs());
+    setEndDate(dayjs().add(1, 'hour'));
+    setDueDate(dayjs().add(1, 'day'));
   }
 
-  const filteredMembers = React.useMemo(() => {
+  const createTeamTask = async(taskData) => {
+    const enrichedTaskData = {
+      ...taskData,
+      start: startDate.toISOString(),
+      end: endDate.toISOString(),
+      dueDate: dueDate.toISOString(),
+      color: taskData?.color || '#FF5733',
+      status: 'pending',
+      team:teamId
+    };
+
+    const users = selectedUsers.map(u => (u.id ));
+    const payload = {
+      users,
+      task: enrichedTaskData
+    };
+
+    const res = await assignTaskToTeam(
+      auth.token,
+      auth.refreshToken,
+      teamId,
+      payload
+    );
+
+    close();
+  }
+
+  const filteredMembers = useMemo(() => {
     if (!searchValue) return members;
 
     const query =
@@ -38,81 +86,43 @@ export const TaskModalTeams = ({ open, onClose, members, user,auth,updateAccessT
   };
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogContent>
-
-        <TaskForm />
-
-        <Typography mt={2} mb={1}>
-          Assign Task To
-        </Typography>
+    <Dialog open={open} onClose={onClose} maxWidth={false}>
+      <DialogContent >
+        <Calendar></Calendar>
+        <TaskForm  onSubmit={setTaskData} setTaskData={setTaskData} taskData={taskData}></TaskForm>
 
         <Autocomplete
-          options={members}
-          freeSolo
-          getOptionLabel={(option) => {
-            if (typeof option === "string") return option;
-            return `${option.firstname} ${option.lastname}`;
-          }}
-          
-          onInputChange={(e, value) => setSearchValue(value)}
-          renderInput={(params) => (
-            <TextField {...params} label="Search Members" />
+        multiple
+        options={members}
+        disableCloseOnSelect
+        getOptionLabel={(option)=>`${option.firstname} ${option.lastname}`}
+        value={selectedUsers}
+        onChange={(event, newValue)=>setSelectedUsers(newValue)}
+        renderOption={(props, option, { selected }) => (
+          <li {...props} key={option.id} >
+            <Checkbox style={{ marginRight: 8 }} checked={selected} />
+            {option.firstname} {option.lastname}
+          </li>
+        )}
+        renderInput={(params) => (
+          <TextField 
+            {...params} 
+            label="Select Team Members" 
+            placeholder="Search by name..." 
+          />
           )}
-
-          renderOption={(props, option) => (
-            <li {...props} key={option.id}>
-              {option.firstname} {option.lastname}
-            </li>
-          )}
-
-        />
-
-        <Box
-          mt={2}
-          sx={{
-            maxHeight: 250,
-            overflowY: "auto",
-            border: "1px solid #ddd",
-            borderRadius: 2,
-            p: 1
-          }}
+          sx={{ width: '100%', my:2 }}
         >
-          <Stack spacing={1}>
-            {filteredMembers.map(user => {
-              const checked = selectedUsers.some(u => u.id === user.id);
 
-              return (
-                <Stack
-                  key={user.id}
-                  direction="row"
-                  alignItems="center"
-                  spacing={1}
-                >
-                  <Checkbox
-                    checked={checked}
-                    onChange={() => toggleUser(user)}
-                  />
-                  <Typography>
-                    {user.firstname} {user.lastname}
-                  </Typography>
-                </Stack>
-              );
-            })}
-          </Stack>
-        </Box>
+        </Autocomplete>
 
       </DialogContent>
       <DialogActions>
-
-        <Button variant='contained' onClick={createTeamTask}>
-          Assign
-        </Button>
-        <Button color='error' variant='contained' onClick={onClose}>
-          Cancel
-        </Button>
-
+        <Button variant='contained' onClick={()=>{
+          createTeamTask(taskData)}}>Submit</Button>
+        <Button variant='contained' color='error' onClick={close}>Cancel</Button>
       </DialogActions>
+
     </Dialog>
   );
 };

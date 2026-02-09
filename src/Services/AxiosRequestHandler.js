@@ -11,6 +11,7 @@ export const sendRequest = async (method, url, data, token, refreshToken) => {
         return { data: res.data };
 
     } catch (err) {
+
         try{
             if (err.response?.status === 403) {
             const newToken = await refreshTokenFunc(refreshToken);
@@ -30,6 +31,7 @@ export const sendRequest = async (method, url, data, token, refreshToken) => {
                 return "logout";
             }
         }catch(err){
+
             return "logout";
         }
 
@@ -42,6 +44,7 @@ const refreshTokenFunc=async(refreshToken)=>{
         let res=await axios.post(`http://localhost:8000/auth/refresh`,null,{headers:{Authorization:`Bearer ${refreshToken}`}});
         return res.data.token;
     }catch(err){
+
         return "logout";
     }
 }

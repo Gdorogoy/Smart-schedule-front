@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { getTeam } from '../../Services/TeamService';
 import { AuthContext } from '../../AuthProvider';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { replace, useLocation, useNavigate } from 'react-router-dom';
 import { Box, Button, List, Stack, Typography } from '@mui/material';
 import Sidebar from '../Sidebar';
 import TaskComponent from '../Task/TaskComponent';
@@ -23,6 +23,7 @@ const TeamView = () => {
 
   useEffect(() => {
     if (!state?.team?.id) {
+      navigate('/teams');
       return;
     }
     const getTeamInfo = async () => {
@@ -44,7 +45,9 @@ const TeamView = () => {
     getTeamInfo();
   }, [state?.team?.id, user.token, user.refreshToken]);
 
-  if (!team) return <Box sx={{ p: 3 }}>Loading...</Box>;
+  if (!team) {
+    return <Box sx={{ p: 3 }}>Loading...</Box>;
+  }
 
   const toggleDrawer = () => {
     setOpenSideBar(prev => !prev);
@@ -59,10 +62,9 @@ const TeamView = () => {
   }
 
   const getMembersAutoInfo = () => {
-    console.log(team)
     const teamMembers = [
-      ...team.teamLeads.map(t => ({ id: t.id, firstname: t.firstname, lastname: t.lastname })),
-      ...team.members.map(m => ({ id: m.id, firstname: m.firstname, lastname: m.lastname }))
+      ...team.teamLeads.map(t => ({ id: t.userId, firstname: t.firstname, lastname: t.lastname })),
+      ...team.members.map(m => ({ id: m.userId, firstname: m.firstname, lastname: m.lastname }))
     ];
     return teamMembers;
   };
@@ -170,7 +172,10 @@ const TeamView = () => {
           </Typography>
           
           <Stack spacing={2}>
-              <Box>
+              <Box sx={{
+                overflow:'auto',
+                maxHeight:'75'
+              }}>
                 <Typography 
                   variant="subtitle2" 
                   color="text.secondary" 
@@ -185,7 +190,10 @@ const TeamView = () => {
                 </List>
               </Box>
 
-              <Box>
+              <Box sx={{
+                overflow:'auto',
+                maxHeight:'75'
+              }}>
                 <Typography 
                   variant="subtitle2" 
                   color="text.secondary" 
@@ -206,18 +214,29 @@ const TeamView = () => {
           width: '70%',
           flexShrink: 0,
           display:'flex',
-          flexDirection:'row',
+          flexDirection:'column',
 
         }}>
-          <Typography variant="h5" sx={{ mb: 3 }}>
+          <Box sx={{
+            display:'flex',
+            flexDirection:'row'
+            
+          }}>
+            <Typography variant="h5" sx={{ mb: 3 }}>
             Tasks
           </Typography>
           <Button variant="contained" sx={{ fontWeight: "bold", mb: 3, ml: 4 ,whiteSpace: "nowrap"}} onClick={toggleTask}>
             Assign Task
           </Button>
-
+          </Box>
           
-          <List sx={{ width: '100%', p: 0 }}>
+
+          <Box sx={{
+            width:'100%',
+            maxHeight:'80vh',
+            overflow:'auto'
+          }}>
+            <List sx={{ width: '100%', p: 0 }}>
             {teamTasks.map(t => (
               <TaskComponent 
                 key={t.id} 
@@ -229,6 +248,7 @@ const TeamView = () => {
               />
             ))}
           </List>
+          </Box>
         </Box>
       </Box>
 
@@ -273,4 +293,3 @@ export default TeamView;
     add condiditonal rendering (pass from backend what allowed and whats not )
 
 */
-

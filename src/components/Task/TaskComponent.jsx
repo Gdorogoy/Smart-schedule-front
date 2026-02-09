@@ -107,7 +107,6 @@ const TaskComponent = (props ) => {
    const handleFindColor = () => {
       if(isTeam){
         const { progress } = getTaskTime();
-        console.log(progress)
         if (progress < 0.5) return colors.green;
         if (progress < 0.75) return colors.yellow;
         return colors.red;

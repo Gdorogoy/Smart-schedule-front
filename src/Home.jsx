@@ -12,7 +12,6 @@ const Home = () => {
   const navigate = useNavigate();
   const {user,logout,loading,setLoading,auth}=useContext(AuthContext);
   const [events, setEvents] = useState([]);
-
   useEffect(() => {
     const getData = async () => {
       try {

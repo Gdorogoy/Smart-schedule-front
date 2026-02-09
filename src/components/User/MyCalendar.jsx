@@ -11,7 +11,7 @@ import { AuthContext } from "../../AuthProvider.jsx";
 import { getUser } from "../../Services/UserService.js";
 
 
-const MyCalendar = ({events,setEvents}) => {
+const MyCalendar = ({events,setEvents,styles}) => {
   const {user,setUser,loading,logout,auth}=useContext(AuthContext);
   useEffect(() => {
     if (loading) return;

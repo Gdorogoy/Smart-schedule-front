@@ -13,11 +13,13 @@ import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 
 
-const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
+const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete,setTaskData,taskData}) => {
 
 
-    const [importance,setImportance]=useState(1);
-    const [color,setColor]=useState("");
+    const [title, setTitle] = useState(initialData?.title || "");
+    const [description, setDescription] = useState(initialData?.description || "");
+    const [importance, setImportance] = useState(initialData?.importance || 1);
+
 
     useEffect(()=>{
         if(initialData?.importance!=null){
@@ -31,14 +33,27 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
 
     const handleAdd=()=>{
         if(importance<10){
-    setImportance(importance+1);
+            setImportance(importance+1);
+            if(taskData && setTaskData){
+                setTaskData({...taskData,importance:importance});
+            }
         }
     }
     const handleMinus=()=>{
         if(importance>1){
-    setImportance(importance-1);
+            setImportance(importance-1);
+            if(taskData && setTaskData){
+                setTaskData({...taskData,importance:importance});
+            }
         }
     }
+    // const handleTitle=()=>{
+
+    // }
+    // const handleDescrption=()=>{
+
+    // }
+
     
     const handleSubmit = (ev) => {
         ev.preventDefault();
@@ -48,8 +63,8 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
     description: ev.target.description.value,
     importance:importance
         };
-        setImportance(1);
         onSubmit(formData);
+        
     };
 
     return (
@@ -57,6 +72,10 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
     <Box component="form" onSubmit={handleSubmit} id="event-form">
         <Stack spacing={2} sx={{ mt: 1 }}>
             <TextField
+            onChange={taskData && setTaskData? (e)=> {
+                setTitle(e)
+                setTaskData({...taskData,title:e.target.value});
+            }:null}
             label="Title"
             name="title"
             fullWidth
@@ -64,6 +83,10 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
             required
             />
             <TextField
+            onChange={taskData && setTaskData? (e)=> {
+                setDescription(e)
+                setTaskData({...taskData,description:e.target.value});
+            }:null}
             label="Description"
             name="description"
             fullWidth
@@ -100,3 +123,11 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete}) => {
 };
 
 export default TaskForm;
+
+
+/*
+
+todo :add assign by role (diplay by roles)
+
+if time -> add : color to task , add deadline , add current task working on.
+*/
