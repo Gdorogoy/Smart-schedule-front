@@ -15,7 +15,7 @@ const Home = () => {
   useEffect(() => {
     const getData = async () => {
       try {
-        const res = await getTasks(auth.token,auth.userId);
+        const res = await getTasks(auth.token,user.userId);
         if (res.data.content) {
           setEvents(res.data.content);
         }

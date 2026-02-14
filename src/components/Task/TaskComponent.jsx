@@ -2,14 +2,15 @@ import React, { Component, useContext, useState } from 'react'
 import { Box, Button, Card, IconButton, ListItem, ListItemButton, ListItemText, Typography } from '@mui/material'
 import EventFormDialog from './EventFormDialog'
 import EditIcon from "@mui/icons-material/Edit";
-import { deleteTask, updateTask } from '../../Services/TaskService.js';
+import { createTask, deleteTask, finishTask, updateTask } from '../../Services/TaskService.js';
 import { AuthContext } from '../../AuthProvider.jsx';
+import { assignMembersToTask } from '../../Services/TeamService.js';
 
 
 const TaskComponent = (props ) => {
 
   
-  const { ev,setEvents,events,isTeam} = props
+  const { ev,setEvents,events,isTeam,onComplete,members} = props
   const {user,setUser,loading,logout,auth}=useContext(AuthContext);
 
   const [openForm,setOpenForm]=useState(false);
@@ -27,6 +28,32 @@ const TaskComponent = (props ) => {
   const initialData={...ev,selectedRange};
   
 
+  const handleCompleteTask=async()=>{
+      try {
+      const res = await finishTask(auth.token,auth.userId,ev.id,auth.refreshToken);
+      if(res==="logout"){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
+      }
+      setOpenForm(false);
+
+    } catch (err) {
+      console.error("Complete error:", err);
+    }
+  }
+
+  const handleOnAssignMember=async(memberList)=>{
+      try{
+        console.log(memberList)
+        const res= await assignMembersToTask(auth.token,user.userId,ev.id,memberList,auth.refreshToken)
+      }
+      catch (err) {
+      console.error("Complete error:", err);
+    }
+  }
 
   const handleOpenForm=()=>{
     setOpenForm(true);
@@ -36,7 +63,7 @@ const TaskComponent = (props ) => {
   }
   const handleSubmitForm=async(event)=>{
     try{
-      const res=await updateTask(auth.token,auth.userId,event.id,event);
+      const res=await updateTask(auth.token,auth.userId,event.id,event,auth.refreshToken);
       if(res==="logout"){
         logout();
         return;
@@ -59,10 +86,34 @@ const TaskComponent = (props ) => {
     }
     
   }
+  const handleCreateTask=async(event)=>{
+    try{
+      const res=await createTask(auth.token,auth.userId,event,auth.refreshToken);
+      if(res==="logout"){
+        logout();
+        return;
+      }
+      if(res.newToken){
+        updateAccessToken(res.newToken);
+      }
+      const updated=res.data.content;
+      const upEvents=events.map(
+        ev=>
+          ev.id===updated.id?
+            updated 
+            :
+            ev
+        );
+        setEvents(upEvents);
+      setOpenForm(false);
+    }catch(err){
+      console.error("Update error:", err);
+    }
+  }
 
   const handleDelete = async () => {
     try {
-      const res = await deleteTask(auth.token,auth.userId,ev.id);
+      const res = await deleteTask(auth.token,auth.userId,ev.id,auth.refreshToken);
       if(res==="logout"){
         logout();
         return;
@@ -116,13 +167,13 @@ const TaskComponent = (props ) => {
 
 
   return (
-    <ListItem sx={{width:'100%',}}>
+    <ListItem sx={{width:'100%'}}>
         <Card sx={{
           width:"100%",
           p:2,
           borderRadius:2,
           border:'2px solid blue',
-          backgroundColor:handleFindColor()
+          backgroundColor:isTeam? handleFindColor() :initialData.color
         }}>
           <Box sx={{
             display:'flex',
@@ -155,6 +206,11 @@ const TaskComponent = (props ) => {
         onClose={handleCloseForm}
         initialData={initialData}
         onSubmit={handleSubmitForm}
+        onComplete={handleCompleteTask}
+        isTeam={isTeam}
+        members={members}
+        onAssignMember={handleOnAssignMember}
+        onCreate={handleCreateTask}
       />
 
     </ListItem>

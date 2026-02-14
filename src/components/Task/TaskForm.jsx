@@ -19,6 +19,7 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete,setTask
     const [title, setTitle] = useState(initialData?.title || "");
     const [description, setDescription] = useState(initialData?.description || "");
     const [importance, setImportance] = useState(initialData?.importance || 1);
+    const [color,setColor]=useState(initialData?.color || "");
 
 
     useEffect(()=>{
@@ -47,13 +48,6 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete,setTask
             }
         }
     }
-    // const handleTitle=()=>{
-
-    // }
-    // const handleDescrption=()=>{
-
-    // }
-
     
     const handleSubmit = (ev) => {
         ev.preventDefault();
@@ -106,16 +100,6 @@ const TaskForm = ({ open, onClose, initialData, onSubmit ,isOne,onDelete,setTask
             </Button>
             </Stack>
         </Stack>
-
-        {isOne &&(
-        <Button
-        color="error"
-        variant="contained"
-        onClick={()=>onDelete(initialData)}
-        >
-        Delete
-        </Button>
-    )}
     </Box>
 
 
@@ -126,8 +110,21 @@ export default TaskForm;
 
 
 /*
+todo:
 
-todo :add assign by role (diplay by roles)
+1) add task done (by force or logicaly)
 
-if time -> add : color to task , add deadline , add current task working on.
+
+
+
+
+2) add task color 
+3) add notification (task assigned) new service
+4) add task request to reassing or change task
+5) add taks that the user currently working on 
+
+
+
+
+
 */

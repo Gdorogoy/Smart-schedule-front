@@ -19,6 +19,7 @@ const TeamView = () => {
   const [openTasks,setOpenTask]=useState(false);
   const [teamTasks, setTeamTasks] = useState([]);
   const navigate= useNavigate();
+  const [role,setRole]=useState("");
 
 
   useEffect(() => {
@@ -38,12 +39,21 @@ const TeamView = () => {
         }
         setTeam(res.data.content);
         setTeamTasks(res.data.content.tasks);
+        const isTeamLead=res.data.content.teamLeads.some((usr)=>usr.userId===user.userId);
+        if(isTeamLead){
+          setRole("teamlead");
+        }else{
+          setRole("member");
+        }
+
       } catch (err) {
         console.error(err);
       }
     }
     getTeamInfo();
   }, [state?.team?.id, user.token, user.refreshToken]);
+
+
 
   if (!team) {
     return <Box sx={{ p: 3 }}>Loading...</Box>;
@@ -125,10 +135,6 @@ const TeamView = () => {
       p: 3,
       boxSizing: 'border-box'
     }}>
-      {/* Header with buttons */}
-      {/* <Box sx={{ mb: 3, display: 'flex', gap: 2, alignItems: 'center' }}>
-
-      </Box> */}
       <Box sx={{display:'flex' , flexDirection:'row' }}> 
 
 
@@ -225,9 +231,10 @@ const TeamView = () => {
             <Typography variant="h5" sx={{ mb: 3 }}>
             Tasks
           </Typography>
+          {role==="teamlead" &&(
           <Button variant="contained" sx={{ fontWeight: "bold", mb: 3, ml: 4 ,whiteSpace: "nowrap"}} onClick={toggleTask}>
             Assign Task
-          </Button>
+          </Button>)}
           </Box>
           
 
@@ -245,6 +252,7 @@ const TeamView = () => {
                 events={teamTasks}
                 setEvents={setTeamTasks} 
                 isTeam={true}
+                members={members}
               />
             ))}
           </List>
@@ -255,7 +263,6 @@ const TeamView = () => {
       <Sidebar open={openSidebar} setOpen={setOpenSideBar} />
     </Box>
 
-    {/* <EventFormDialog open={openTasks} onClose={handleCloseForm} onSubmit={handleSubmit}/> */}
     <TaskModalTeams 
     open={openTasks} 
     onClose={handleCloseForm} 

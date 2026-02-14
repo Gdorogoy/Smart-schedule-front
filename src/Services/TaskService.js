@@ -20,3 +20,8 @@ export const deleteTask = async (token, userId, taskId ,refreshToken) => {
   const res=await sendRequest("DELETE",`${BASE_URL}/delete/${userId}/${taskId}`,null,token,refreshToken);
   return res;
 };
+
+export const finishTask= async (token, userId ,taskId ,refreshToken)=>{
+  const res=await sendRequest("PATCH",`${BASE_URL}/update/complete/${userId}/${taskId}`,null,token,refreshToken);
+  return res;
+}

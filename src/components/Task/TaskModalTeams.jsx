@@ -1,5 +1,5 @@
 import {Autocomplete, Dialog, DialogContent, Stack, TextField, Typography, Checkbox, Box, DialogActions, Button, Container} from '@mui/material'
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import TaskForm from './TaskForm';
 import { assignTaskToTeam } from '../../Services/TeamService';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -8,7 +8,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import Calendar from '../calendar/calendar';
 
-export const TaskModalTeams = ({ open, onClose, members, user, auth, updateAccessToken, teamId }) => {
+export const TaskModalTeams = ({ open, onClose, members, user, auth, updateAccessToken, teamId,initialData }) => {
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [searchValue, setSearchValue] = useState(null);
   
@@ -16,16 +16,40 @@ export const TaskModalTeams = ({ open, onClose, members, user, auth, updateAcces
   const [endDate, setEndDate] = useState(dayjs().add(1, 'hour'));
   const [dueDate, setDueDate] = useState(dayjs().add(1, 'day'));
   const [taskData, setTaskData] = useState({
-    title:"",
-    description:"",
-    importance:1,
-    start:startDate,
-    end:endDate,
-    dueDate:endDate,
-    color:null,
-    status:"pending",
-    team:null,
+    
   });
+
+
+  useEffect(()=>{
+    if(!open) return;
+    if(initialData){
+      setTaskData({
+        title:initialData?.title  || "",
+        description:initialData?.description  ||"",
+        importance:initialData?.importance  ||1,
+        color:initialData?.color  ||null,
+        status:initialData?.status ||"pending",
+        team:initialData?.team ||null,
+      });
+      if (initialData.start) setStartDate(dayjs(initialData.start));
+      if (initialData.end) setEndDate(dayjs(initialData.end));
+      if (initialData.dueDate) setDueDate(dayjs(initialData.dueDate));
+    }else {
+      setTaskData({
+        title: "",
+        description: "",
+        importance: 1,
+        color: null,
+        status: "pending",
+        team: null,
+      });
+      setStartDate(dayjs());
+      setEndDate(dayjs().add(1, 'hour'));
+      setDueDate(dayjs().add(1, 'day'));
+    }
+
+
+  },[initialData,open]);
 
 
   const close = () => {
