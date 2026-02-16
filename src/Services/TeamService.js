@@ -21,7 +21,9 @@ export const assignMembersToTask=async (token,userId, taskId,data,refreshToken)=
   const res=await sendRequest("PUT",`${BASE_URL}/add/${taskId}`,{membersList:data},token,refreshToken);
   return res;
 }
+export const joinTeam=async(token,userId,teamCode,refreshToken)=>{
+  const res=await sendRequest("PATCH",`${BASE_URL}/join/${teamCode}/${userId}`,null,token,refreshToken);
+  return res;
+}
 
 
-//  todo :::: 
-// 3) add auto access token update when updated from backend (used refresh token);

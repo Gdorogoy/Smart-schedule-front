@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, Box, Typography, MenuItem, Select, FormControl,
-  InputLabel, TextField,
+   TextField,
   Autocomplete,
   Checkbox,
   Stack,
@@ -35,6 +35,7 @@ const EventFormDialog = ({
   const [description,setDescription]=useState(initialData?.description  ||" ");
   const [title,setTitle]=useState(initialData?.title  || " ");
   const [color,setColor]=useState(initialData?.color  ||'#ffffff');
+  const [status,setStatus]=useState(initialData?.status || "pending");
 
 
   useEffect(() => {
@@ -48,6 +49,7 @@ const EventFormDialog = ({
     setTitle(initialData?.title || "");
     setDescription(initialData?.description || "");
     setColor(initialData?.color || '#ffffff');
+    setStatus(initialData?.status || "pending");
   }, [open, initialData]);
   const toDateTimeLocal = (iso) => new Date(iso).toISOString().slice(0, 16);
 

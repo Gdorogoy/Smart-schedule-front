@@ -6,11 +6,13 @@ import { getTeams } from '../../Services/TeamService';
 import FormatAlignJustifyIcon from '@mui/icons-material/FormatAlignJustify';
 import GroupsIcon from '@mui/icons-material/Groups';
 import Sidebar from '../Sidebar';
+import JoinTeam from './JoinTeam';
 
 const TeamsComponent = () => {
     const {user,logout,updateAccessToken,auth}=useContext(AuthContext);
     const [teams,setTeams]=useState([]);
     const [openSidebar, setOpenSideBar] = useState(false);
+    const [openJoin,setOpenJoin]=useState(false);
     
 
     useEffect(() => {
@@ -43,15 +45,10 @@ const TeamsComponent = () => {
         setOpenSideBar(prev => !prev);
     };
 
+    const toggleModal=()=>{
+        setOpenJoin(prev=> !prev);
+    }
 
-    /*
-    1) build a list of teams -- done
-    2) add fetch teams for user  --done
-    3) add search team by name --done 
-    4) add join team 
-    5) add filter teams
-
-    */
 
 
 
@@ -67,9 +64,10 @@ const TeamsComponent = () => {
                 <Autocomplete sx={{ mb:4,ml:2 ,width:'45%'}}
                 options={teams.map((t)=>t.name)}
                 freeSolo
-                renderInput={(params=> <TextField {...params} label='searchTeams'/>)}
+                renderInput={(params=> <TextField {...params} label='Search for teams'/>)}
                 >
                 </Autocomplete>
+                <Button sx={{mb:4 ,ml:2 ,fontWeight:'bold'}} variant='contained'onClick={toggleModal}> Join team</Button>
 
             </Box>
             <Stack spacing={2} alignItems="center" margin="20px">
@@ -80,9 +78,7 @@ const TeamsComponent = () => {
             </List>
             </Stack>
             <Sidebar open={openSidebar} setOpen={setOpenSideBar} />
-
-        
-                
+            <JoinTeam open={openJoin} onClose={toggleModal}/>
         </>
     );
 }

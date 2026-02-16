@@ -10,7 +10,7 @@ import { assignMembersToTask } from '../../Services/TeamService.js';
 const TaskComponent = (props ) => {
 
   
-  const { ev,setEvents,events,isTeam,onComplete,members} = props
+  const { ev,setEvents,events,isTeam,members} = props
   const {user,setUser,loading,logout,auth}=useContext(AuthContext);
 
   const [openForm,setOpenForm]=useState(false);

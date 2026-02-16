@@ -5,7 +5,6 @@ const DisplayTeamTasks = ({task}) => {
   return (
     <ListItem>
         DisplayTeamTasks
-
     </ListItem>
   )
 }

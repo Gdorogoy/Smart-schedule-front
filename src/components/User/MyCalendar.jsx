@@ -25,20 +25,18 @@ const MyCalendar = ({events,setEvents,styles}) => {
   const [selectedRange, setSelectedRange] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null); 
   const [openSidebar,setOpenSideBar]=useState(false);
+
   const calendarEvents = events.map(ev => ({
   id: ev.id,
   title: ev.title,
   start: ev.start,
   end: ev.end,
-
-  // UI rendering
   backgroundColor: ev.color,
-
-  // custom data
   extendedProps: {
     description: ev.description,
     importance: ev.importance,
-    color: ev.color
+    color: ev.color,
+    status: ev.status
   }
 }));
 

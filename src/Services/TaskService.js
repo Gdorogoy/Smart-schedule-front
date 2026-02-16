@@ -22,6 +22,6 @@ export const deleteTask = async (token, userId, taskId ,refreshToken) => {
 };
 
 export const finishTask= async (token, userId ,taskId ,refreshToken)=>{
-  const res=await sendRequest("PATCH",`${BASE_URL}/update/complete/${userId}/${taskId}`,null,token,refreshToken);
+  const res=await sendRequest("PATCH",`${BASE_URL}/update/complete/${userId}/${taskId}`,token,refreshToken);
   return res;
 }

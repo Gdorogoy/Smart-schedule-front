@@ -30,6 +30,7 @@ export const TaskModalTeams = ({ open, onClose, members, user, auth, updateAcces
         color:initialData?.color  ||null,
         status:initialData?.status ||"pending",
         team:initialData?.team ||null,
+        status:initialData?.status || "pending"
       });
       if (initialData.start) setStartDate(dayjs(initialData.start));
       if (initialData.end) setEndDate(dayjs(initialData.end));
